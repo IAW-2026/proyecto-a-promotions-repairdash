@@ -1,21 +1,13 @@
 import HistorialDeUso from './components/HistorialDeUso';
 import CarruselPromociones from './components/Promociones';
+import { prisma } from '@/lib/prisma';
 
-//Hardcodeo de datos para demostración
-const promocionesActivas = [
-  { id: 1, nombre: "Plomería/2", tipoDescuento: "%", valor: "50", descripcion: "Aplica a X servicios" },
-  { id: 2, nombre: "Sumate a la app", tipoDescuento: "$", valor: "300", descripcion: "Para todos los usuarios nuevos" },
-  { id: 3, nombre: "Mayo con vos", tipoDescuento: "%", valor: "15", descripcion: "Disfruta del mes de Mayo" },
-];
-const historialPromociones = [
-  { id: 1, nombre: "Promoción 1", fechaUso: "2024-06-01" },
-  { id: 2, nombre: "Promoción 2", fechaUso: "2024-06-02" },
-  { id: 3, nombre: "Promoción 3", fechaUso: "2024-06-03" },
-  { id: 4, nombre: "Promoción 4", fechaUso: "2024-06-04" },
-  { id: 5, nombre: "Promoción 5", fechaUso: "2024-06-05" }
-];
-
-export default function PaginaInicio() {
+export default async function PaginaInicio() {
+  const promocionesActivas = await prisma.promocion.findMany();
+  const historialPromociones = (await prisma.historialDeUso.findMany()).map((item) => ({
+    ...item,
+    fechaUso: item.fechaUso.toLocaleDateString('es-AR'),
+  }));
   return (
     <main className="flex min-h-screen flex-col p-4 md:p-8 pt-0 bg-[#271033] text-white w-full">
       {/* Header */}
