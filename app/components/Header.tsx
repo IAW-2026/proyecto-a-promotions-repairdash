@@ -16,9 +16,11 @@ export default function Header() {
   return (
     <header className="w-full px-4 md:px-8 py-6 bg-[#1f0627] border-b border-[#8D62A5]">
         <div className="flex items-center justify-between">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-            RepairDash
-            </h1>
+            <Link href="/">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight hover:opacity-80 transition-opacity cursor-pointer">
+                RepairDash
+              </h1>
+            </Link>
 
         {/* Desktop */}
         <nav className="hidden md:flex items-center gap-6">
