@@ -31,7 +31,8 @@ model Promocion {
   valor         Float
   descripcion   String
   usoUnico      Boolean          @default(false)
-  mostrar       Boolean          @default(false)
+  destacada     Boolean          @default(false)
+  mostrar       Boolean          @default(true)
   precioMinimo  Float?
   categorias    String[]
   historial     HistorialDeUso[]
