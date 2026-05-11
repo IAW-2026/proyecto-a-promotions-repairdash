@@ -1,9 +1,10 @@
 
-
 type ItemHistorial = {
   id: number;
   nombre: string;
   fechaUso: string;
+  valorPagado: number;
+  valorOriginal: number;
 };
 
 const MAX_VISIBLE = 4;
@@ -18,20 +19,26 @@ export default function HistorialDeUso({ historial }: { historial: ItemHistorial
   </div>
   ) : (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {recientes.map((item) => (
-          <div key={item.id} className="p-4 bg-[#8D62A5] rounded-2xl border border-[#C392DD]">
-            <p className="text-white font-semibold">{item.nombre}</p>
-            <p className="text-[#FBDAF9] text-sm">{item.fechaUso}</p>
-          </div>
-        ))}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {recientes.map((item) => (
+      <div key={item.id} className="p-4 bg-[#8D62A5] rounded-2xl border border-[#C392DD] flex justify-between items-center">
+        <div>
+          <p className="text-white font-semibold">{item.nombre}</p>
+          <p className="text-[#FBDAF9] text-sm">{item.fechaUso}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-[#FBDAF9] text-sm line-through">${item.valorOriginal}</p>
+          <p className="text-[#FBDAF9] font-semibold">${item.valorPagado}</p>
+        </div>
       </div>
+    ))}
+  </div>
 
-      {historial.length > MAX_VISIBLE && (
-        <button className="mt-6 mx-auto block px-6 py-2 bg-transparent border border-[#C392DD] text-[#C392DD] rounded-lg hover:bg-[#C392DD] hover:text-white transition-colors">
-          Ver historial completo →
-        </button>
-      )}
-    </>
-  );
+  {historial.length > MAX_VISIBLE && (
+    <button className="mt-6 mx-auto block px-6 py-2 bg-transparent border border-[#C392DD] text-[#C392DD] rounded-lg hover:bg-[#C392DD] hover:text-white transition-colors">
+      Ver historial completo →
+    </button>
+  )}
+</>
+);
 }

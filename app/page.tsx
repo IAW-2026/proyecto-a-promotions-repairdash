@@ -3,7 +3,9 @@ import CarruselPromociones from './components/Promociones';
 import { prisma } from '@/lib/prisma';
 
 export default async function PaginaInicio() {
-  const promocionesActivas = await prisma.promocion.findMany();
+  const promocionesActivas = await prisma.promocion.findMany({
+    where: { mostrar: true }
+  });
   const historialPromociones = (await prisma.historialDeUso.findMany()).map((item) => ({
     ...item,
     fechaUso: item.fechaUso.toLocaleDateString('es-AR'),
