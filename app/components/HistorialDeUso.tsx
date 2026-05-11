@@ -35,10 +35,13 @@ export default function HistorialDeUso({ historial }: { historial: ItemHistorial
   </div>
 
   {historial.length > MAX_VISIBLE && (
-    <button className="mt-6 mx-auto block px-6 py-2 bg-transparent border border-[#C392DD] text-[#C392DD] rounded-lg hover:bg-[#C392DD] hover:text-white transition-colors">
-      Ver historial completo →
-    </button>
-  )}
-</>
-);
+        <a
+          href="/historial"
+          className="mt-6 mx-auto block px-6 py-2 bg-transparent border border-[#C392DD] text-[#C392DD] rounded-lg hover:bg-[#C392DD] hover:text-white transition-colors text-center w-fit"
+        >
+          Ver historial completo →
+        </a>
+      )}
+    </>
+  );
 }
