@@ -16,16 +16,33 @@ model HistorialDeUso {
   id            Int       @id @default(autoincrement())
   fechaUso      DateTime  @default(now())
   nombre        String
+  promocion   Promocion @relation(fields: [promocionId], references: [id])
   promocionId   Int
-  trabajoId     Int?
-  montoPagado   Int?
-  montoSinPromo Int?
+  trabajoId     Int
+  valorPagado   Float
+  valorOriginal Float
 }
 
 model Promocion {
   id            Int      @id @default(autoincrement())
   nombre        String
+  codigo        String  
   tipoDescuento String
   valor         Float
   descripcion   String
+  usoUnico      Boolean          @default(false)
+  mostrar       Boolean          @default(false)
+  precioMinimo  Float?
+  categorias    String[]
+  historial     HistorialDeUso[]
+  usuarios      UsuariosEnPromocion[]
+}
+
+model UsuariosEnPromocion {
+  promocion   Promocion @relation(fields: [promocionId], references: [id])
+  promocionId Int
+  usuarioId   String
+  usado       Boolean   @default(false)
+
+  @@id([promocionId, usuarioId])
 }

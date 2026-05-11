@@ -1,17 +1,19 @@
 "use client";
 import { useRef, useState } from "react";
+import Link from 'next/link';
 
 type Promocion = {
   id: number;
   nombre: string;
   tipoDescuento: string;
-  valor: number;
+  valor: string;
   descripcion: string;
+  codigo: string;
 };
 
 function CartaPromocion({ promo }: { promo: Promocion }) {
   const [copiado, setCopiado] = useState(false);
-  const codigo = promo.nombre.toUpperCase().replace(/\s/g, "");
+  const codigo = promo.codigo.toUpperCase().replace(/\s/g, "");
 
   const copiar = () => {
     navigator.clipboard.writeText(codigo);
@@ -20,15 +22,14 @@ function CartaPromocion({ promo }: { promo: Promocion }) {
   };
 
   return (
-    <div className="min-w-[280px] flex-shrink-0 snap-start p-6 bg-[#8D62A5] rounded-2xl shadow-lg border border-[#C392DD] hover:border-[#F500F1] transition-colors">
+    <div className="w-[320px] flex-shrink-0 snap-start p-6 bg-[#8D62A5] rounded-2xl shadow-lg border border-[#C392DD] hover:border-[#F500F1] transition-colors">     
       <h4 className="text-xl font-bold text-white mb-2">{promo.nombre}</h4>
       <p className="text-[#FBDAF9] mb-1">
         <span className="font-semibold text-[#F500F1]">
           {promo.tipoDescuento}{promo.valor} off
         </span>
       </p>
-      <p className="text-[#FBDAF9] mb-4">{promo.descripcion}</p>
-
+      <p className="text-[#FBDAF9] mb-4 break-words whitespace-normal">{promo.descripcion}</p>
       {/* Código con botón copiar */}
       <div className="flex items-center gap-2 bg-[#271033] rounded-lg px-3 py-2 mb-4">
         <span className="font-mono text-sm text-[#F500F1] flex-1 tracking-widest">
@@ -51,10 +52,6 @@ function CartaPromocion({ promo }: { promo: Promocion }) {
           )}
         </button>
       </div>
-
-      <button className="w-full px-4 py-2 bg-[#C392DD] text-white rounded-lg font-medium hover:bg-[#F500F1] transition-colors">
-        Aplicar Promoción
-      </button>
     </div>
   );
 }
@@ -108,6 +105,11 @@ export default function CarruselPromociones({ promociones }: { promociones: Prom
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
+        <div className="text-right mt-4">
+          <Link href="/promociones" className="px-4 py-2 bg-transparent border border-[#C392DD] text-[#C392DD] rounded-lg hover:bg-[#C392DD] hover:text-white transition-colors text-sm font-medium">
+            Ver todas las promociones →
+          </Link>
+        </div>
       </div>
     </div>
   );
