@@ -6,7 +6,7 @@ type Promocion = {
   id: number;
   nombre: string;
   tipoDescuento: string;
-  valor: string;
+  valor: number;
   descripcion: string;
   codigo: string;
 };
