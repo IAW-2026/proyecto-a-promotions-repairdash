@@ -14,7 +14,7 @@ datasource db {
 
 model Usuario {
   nombre          String
-  id              Int      @id @default(autoincrement())
+  id              String      @id 
   fechaRegistro   DateTime @default(now())
   historial       HistorialDeUso[]
 }
@@ -24,10 +24,10 @@ model HistorialDeUso {
   fechaUso      DateTime  @default(now())
   nombre        String
   promocion     Promocion @relation(fields: [promocionId], references: [id])
-  promocionId   Int
-  trabajoId     Int
+  promocionId   Int       
   usuario       Usuario   @relation(fields: [usuarioId], references: [id])
-  usuarioId     Int
+  usuarioId     String       
+  trabajoId     Int
   valorPagado   Float
   valorOriginal Float
 }
