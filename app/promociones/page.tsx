@@ -1,10 +1,19 @@
 import Header from '../components/Header';
 import { prisma } from '@/lib/prisma';
+import { currentUser } from '@clerk/nextjs/server';
 
 export default async function PaginaPromociones() {
+  const user = await currentUser();
+
   const promociones = await prisma.promocion.findMany({
-    where: { mostrar: true },
-    include: { usuarios: true }
+    where: {
+      mostrar: true,
+      OR: [
+        { usuarios: { none: {} } },
+        { usuarios: { some: { usuarioId: user?.id ?? '' } } },
+      ],
+    },
+    include: { usuarios: true },
   });
 
   return (

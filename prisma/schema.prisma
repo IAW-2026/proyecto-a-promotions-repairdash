@@ -13,10 +13,11 @@ datasource db {
 }
 
 model Usuario {
-  nombre          String
-  id              String      @id 
-  fechaRegistro   DateTime @default(now())
-  historial       HistorialDeUso[]
+  id                  String                @id
+  nombre              String
+  fechaRegistro       DateTime              @default(now())
+  historial           HistorialDeUso[]
+  promociones         UsuariosEnPromocion[]
 }
 
 model HistorialDeUso {
@@ -52,6 +53,7 @@ model UsuariosEnPromocion {
   promocion   Promocion @relation(fields: [promocionId], references: [id])
   promocionId Int
   usuarioId   String
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
   usado       Boolean   @default(false)
 
   @@id([promocionId, usuarioId])
