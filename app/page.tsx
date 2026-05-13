@@ -2,15 +2,26 @@ import Header from './components/Header';
 import HistorialDeUso from './components/HistorialDeUso';
 import CarruselPromociones from './components/Promociones';
 import { prisma } from '@/lib/prisma';
+import { currentUser } from '@clerk/nextjs/server';
 
 export default async function PaginaInicio() {
+  const user = await currentUser();
+  const nombreUsuario = user?.firstName ?? user?.emailAddresses[0].emailAddress ?? 'Usuario';
+
   const promocionesActivas = await prisma.promocion.findMany({
-    where: { destacada : true }
+    where: { destacada: true }
   });
-  const historialPromociones = (await prisma.historialDeUso.findMany()).map((item) => ({
+
+  const historialPromociones = (
+    await prisma.historialDeUso.findMany({
+      where: { usuarioId: user?.id ?? '' },
+      orderBy: { fechaUso: 'desc' },
+    })
+  ).map((item) => ({
     ...item,
     fechaUso: item.fechaUso.toLocaleDateString('es-AR'),
   }));
+
   return (
     <>
       <Header />
@@ -19,10 +30,10 @@ export default async function PaginaInicio() {
         {/* Bienvenida */}
         <section className="text-center mb-12 mt-8">
           <h2 className="text-3xl font-bold text-[#C392DD] mb-4">
-            ¡Hola, Usuario!
+            ¡Hola, {nombreUsuario}!
           </h2>
           <p className="text-[#FBDAF9]">
-            Bienvenido a tu panel de promociones, explora las ofertas disponibles.
+            Bienvenido a tu panel de promociones, explorá las ofertas disponibles.
           </p>
         </section>
 

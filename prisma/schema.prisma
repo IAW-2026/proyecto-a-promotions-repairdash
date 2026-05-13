@@ -12,12 +12,22 @@ datasource db {
   provider  = "postgresql"
 }
 
+model Usuario {
+  id                  String                @id
+  nombre              String
+  fechaRegistro       DateTime              @default(now())
+  historial           HistorialDeUso[]
+  promociones         UsuariosEnPromocion[]
+}
+
 model HistorialDeUso {
   id            Int       @id @default(autoincrement())
   fechaUso      DateTime  @default(now())
   nombre        String
-  promocion   Promocion @relation(fields: [promocionId], references: [id])
-  promocionId   Int
+  promocion     Promocion @relation(fields: [promocionId], references: [id])
+  promocionId   Int       
+  usuario       Usuario   @relation(fields: [usuarioId], references: [id])
+  usuarioId     String       
   trabajoId     Int
   valorPagado   Float
   valorOriginal Float
@@ -43,6 +53,7 @@ model UsuariosEnPromocion {
   promocion   Promocion @relation(fields: [promocionId], references: [id])
   promocionId Int
   usuarioId   String
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
   usado       Boolean   @default(false)
 
   @@id([promocionId, usuarioId])

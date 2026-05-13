@@ -1,6 +1,7 @@
 import Header from '../components/Header';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { currentUser } from '@clerk/nextjs/server';
 
 type ItemHistorial = {
   id: number;
@@ -12,7 +13,10 @@ type ItemHistorial = {
 };
 
 export default async function PaginaHistorial() {
+  const user = await currentUser();
+
   const historial: ItemHistorial[] = await prisma.historialDeUso.findMany({
+    where: { usuarioId: user?.id ?? '' },
     orderBy: { fechaUso: 'desc' },
   });
 
