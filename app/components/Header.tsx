@@ -4,23 +4,33 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { UserButton, useUser } from '@clerk/nextjs';
 
-const links = [
-  { href: '/', label: 'Inicio' },
-  { href: '/promociones', label: 'Promociones' },
-  { href: '/historial', label: 'Historial' },
-];
-
 export default function Header() {
   const pathname = usePathname();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const { user } = useUser();
 
+  // Determinamos si estamos en la sección de administración
+  const isAdmin = pathname.startsWith('/admin');
+
+  // Definimos los links dinámicamente
+  const links = isAdmin 
+    ? [
+        { href: '/admin', label: 'Inicio' },
+        { href: '/admin/promociones', label: 'Promociones' },
+        { href: '/admin/historial', label: 'Historial' },
+      ]
+    : [
+        { href: '/', label: 'Inicio' },
+        { href: '/promociones', label: 'Promociones' },
+        { href: '/historial', label: 'Historial' },
+      ];
+
   return (
     <header className="w-full px-4 md:px-8 py-6 bg-[#1f0627] border-b border-[#8D62A5]">
       <div className="flex items-center justify-between">
-        <Link href="/">
+        <Link href={isAdmin ? "/admin" : "/"}>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight hover:opacity-80 transition-opacity cursor-pointer">
-            RepairDash
+            RepairDash {isAdmin && <span className="text-xs bg-[#F500F1] text-white px-2 py-0.5 rounded align-middle ml-2">ADMIN</span>}
           </h1>
         </Link>
 
