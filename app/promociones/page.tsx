@@ -7,7 +7,7 @@ export default async function PaginaPromociones() {
 
   const promociones = await prisma.promocion.findMany({
     where: {
-      mostrar: true,
+      eliminada: false,
       OR: [
         { usuarios: { none: {} } },
         { usuarios: { some: { usuarioId: user?.id ?? '' } } },

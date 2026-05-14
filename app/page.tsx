@@ -9,7 +9,7 @@ export default async function PaginaInicio() {
   const nombreUsuario = user?.firstName ?? user?.emailAddresses[0].emailAddress ?? 'Usuario';
 
   const promocionesActivas = await prisma.promocion.findMany({
-    where: { destacada: true }
+    where: { destacada: true, eliminada: false }
   });
 
   const historialPromociones = (
