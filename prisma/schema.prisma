@@ -18,6 +18,7 @@ model Usuario {
   fechaRegistro       DateTime              @default(now())
   historial           HistorialDeUso[]
   promociones         UsuariosEnPromocion[]
+  activo              Boolean          @default(true)
 }
 
 model HistorialDeUso {
@@ -55,6 +56,6 @@ model UsuariosEnPromocion {
   usuarioId   String
   usuario     Usuario   @relation(fields: [usuarioId], references: [id])
   usado       Boolean   @default(false)
-
+  
   @@id([promocionId, usuarioId])
 }
