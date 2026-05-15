@@ -2,7 +2,12 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
 const isAdminRoute = createRouteMatcher(['/admin(.*)']);
-const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sso-callback(.*)', '/sin-acceso']);
+const isPublicRoute = createRouteMatcher([
+  '/sign-in(.*)',
+  '/sso-callback(.*)',
+  '/sin-acceso',
+  '/api/webhooks(.*)',
+]);
 
 export default clerkMiddleware(async (auth, req) => {
   // Rutas públicas pasan directo
