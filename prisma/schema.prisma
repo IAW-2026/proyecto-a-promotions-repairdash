@@ -12,20 +12,50 @@ datasource db {
   provider  = "postgresql"
 }
 
+model Usuario {
+  id                  String                @id
+  nombre              String
+  fechaRegistro       DateTime              @default(now())
+  historial           HistorialDeUso[]
+  promociones         UsuariosEnPromocion[]
+  activo              Boolean          @default(true)
+}
+
 model HistorialDeUso {
   id            Int       @id @default(autoincrement())
   fechaUso      DateTime  @default(now())
   nombre        String
-  promocionId   Int
-  trabajoId     Int?
-  montoPagado   Int?
-  montoSinPromo Int?
+  promocion     Promocion @relation(fields: [promocionId], references: [id])
+  promocionId   Int       
+  usuario       Usuario   @relation(fields: [usuarioId], references: [id])
+  usuarioId     String       
+  trabajoId     Int
+  valorPagado   Float
+  valorOriginal Float
 }
 
 model Promocion {
   id            Int      @id @default(autoincrement())
   nombre        String
+  codigo        String  
   tipoDescuento String
   valor         Float
   descripcion   String
+  usoUnico      Boolean          @default(false)
+  destacada     Boolean          @default(false)
+  precioMinimo  Float?
+  categorias    String[]
+  historial     HistorialDeUso[]
+  usuarios      UsuariosEnPromocion[]
+  eliminada     Boolean  @default(false)
+}
+
+model UsuariosEnPromocion {
+  promocion   Promocion @relation(fields: [promocionId], references: [id])
+  promocionId Int
+  usuarioId   String
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+  usado       Boolean   @default(false)
+  
+  @@id([promocionId, usuarioId])
 }
