@@ -9,10 +9,8 @@ export default function Header() {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const { user } = useUser();
 
-  // Determinamos si estamos en la sección de administración
   const isAdmin = pathname.startsWith('/admin');
 
-  // Definimos los links dinámicamente
   const links = isAdmin 
     ? [
         { href: '/admin', label: 'Inicio' },
@@ -24,6 +22,7 @@ export default function Header() {
         { href: '/promociones', label: 'Promociones' },
         { href: '/historial', label: 'Historial' },
       ];
+
 
   return (
     <header className="w-full px-4 md:px-8 py-6 bg-[#1f0627] border-b border-[#8D62A5]">
