@@ -2,11 +2,22 @@
 import Header from '../../../components/Header';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import FiltroUsuariosSelector from '../FiltroUsuarios';
+
+type FiltroUsuarios = {
+  idsEspecificos?: string[];
+  registradosDespuesDe?: string;
+  registradosAntesDe?: string;
+  minimoUsos?: number;
+  maximoUsos?: number;
+};
 
 export default function NuevaPromocion() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [filtroUsuarios, setFiltroUsuarios] = useState<FiltroUsuarios | null>(null);
+  const [filtroConError, setFiltroConError] = useState(false);
   const [form, setForm] = useState({
     nombre: '',
     codigo: '',
@@ -39,6 +50,7 @@ export default function NuevaPromocion() {
         valor: parseFloat(form.valor),
         precioMinimo: form.precioMinimo ? parseFloat(form.precioMinimo) : null,
         categorias: form.categorias ? form.categorias.split(',').map((c) => c.trim()) : [],
+        filtroUsuarios: filtroUsuarios ?? null,
       }),
     });
 
@@ -129,7 +141,9 @@ export default function NuevaPromocion() {
 
             {/* Precio mínimo */}
             <div className="flex flex-col gap-1">
-              <label className="text-[#C392DD] text-sm font-semibold">Precio mínimo <span className="text-[#8D62A5] font-normal">(opcional)</span></label>
+              <label className="text-[#C392DD] text-sm font-semibold">
+                Precio mínimo <span className="text-[#8D62A5] font-normal">(opcional)</span>
+              </label>
               <input
                 name="precioMinimo"
                 type="number"
@@ -141,7 +155,9 @@ export default function NuevaPromocion() {
 
             {/* Categorías */}
             <div className="flex flex-col gap-1">
-              <label className="text-[#C392DD] text-sm font-semibold">Categorías <span className="text-[#8D62A5] font-normal">(separadas por coma)</span></label>
+              <label className="text-[#C392DD] text-sm font-semibold">
+                Categorías <span className="text-[#8D62A5] font-normal">(separadas por coma)</span>
+              </label>
               <input
                 name="categorias"
                 value={form.categorias}
@@ -170,11 +186,20 @@ export default function NuevaPromocion() {
               ))}
             </div>
 
+            {/* Filtro de usuarios */}
+            <div className="pt-2 border-t border-[#8D62A5]">
+              <FiltroUsuariosSelector
+                value={filtroUsuarios}
+                onChange={setFiltroUsuarios}
+                onError={setFiltroConError}
+              />
+            </div>
+
             {error && <p className="text-red-400 text-sm">{error}</p>}
 
             <button
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || filtroConError}
               className="mt-2 px-6 py-3 bg-[#F500F1] text-white rounded-lg font-semibold hover:bg-[#c400c0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Creando...' : 'Crear promoción'}

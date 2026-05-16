@@ -2,6 +2,15 @@
 import Header from '../../../components/Header';
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
+import FiltroUsuariosSelector from '../FiltroUsuarios';
+
+type FiltroUsuarios = {
+  idsEspecificos?: string[];
+  registradosDespuesDe?: string;
+  registradosAntesDe?: string;
+  minimoUsos?: number;
+  maximoUsos?: number;
+};
 
 type PromoForm = {
   nombre: string;
@@ -21,7 +30,9 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [error, setError] = useState('');
-  const [guardado, setGuardado] = useState(false); // Único estado agregado
+  const [guardado, setGuardado] = useState(false);
+  const [filtroUsuarios, setFiltroUsuarios] = useState<FiltroUsuarios | null>(null);
+  const [filtroConError, setFiltroConError] = useState(false);
   const [form, setForm] = useState<PromoForm>({
     nombre: '',
     codigo: '',
@@ -49,6 +60,7 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
           destacada: data.destacada,
           usoUnico: data.usoUnico,
         });
+        setFiltroUsuarios(data.filtroUsuarios ?? null);
         setLoadingData(false);
       });
   }, [id]);
@@ -73,11 +85,12 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
         valor: parseFloat(form.valor),
         precioMinimo: form.precioMinimo ? parseFloat(form.precioMinimo) : null,
         categorias: form.categorias ? form.categorias.split(',').map((c) => c.trim()) : [],
+        filtroUsuarios: filtroUsuarios ?? null,
       }),
     });
 
     if (res.ok) {
-      setGuardado(true); // Se activa el cartel
+      setGuardado(true);
       setTimeout(() => {
         router.push('/admin/promociones');
         router.refresh();
@@ -222,17 +235,25 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
               ))}
             </div>
 
-            {/* Cartel de éxito y errores */}
+            {/* Filtro de usuarios */}
+            <div className="pt-2 border-t border-[#8D62A5]">
+              <FiltroUsuariosSelector
+                value={filtroUsuarios}
+                onChange={setFiltroUsuarios}
+                onError={setFiltroConError}
+              />
+            </div>
+
             {guardado && (
               <p className="text-green-400 text-sm font-medium animate-pulse">
-                Cambios guardados con éxito!
+                ¡Cambios guardados con éxito!
               </p>
             )}
             {error && <p className="text-red-400 text-sm">{error}</p>}
 
             <button
               onClick={handleSubmit}
-              disabled={loading || guardado}
+              disabled={loading || guardado || filtroConError}
               className="mt-2 px-6 py-3 bg-[#F500F1] text-white rounded-lg font-semibold hover:bg-[#c400c0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Guardando...' : guardado ? '¡Guardado!' : 'Guardar cambios'}
