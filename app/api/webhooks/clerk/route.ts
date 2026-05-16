@@ -38,9 +38,8 @@ export async function POST(req: Request) {
 
   if (evt.type === 'user.created') {
     const { id, first_name, last_name, email_addresses, public_metadata } = evt.data;
-    const rol = (public_metadata as { rol?: string })?.rol;
-
-    if (rol === 'rider') {
+    const role = (public_metadata as { role?: string })?.role;
+    if (role === 'rider') {
       const nombre = [first_name, last_name].filter(Boolean).join(' ')
         || email_addresses[0]?.email_address
         || 'Sin nombre';
@@ -63,9 +62,9 @@ export async function POST(req: Request) {
 
   if (evt.type === 'user.updated') {
     const { id, first_name, last_name, email_addresses, public_metadata } = evt.data;
-    const rol = (public_metadata as { rol?: string })?.rol;
+    const role = (public_metadata as { role?: string })?.role;
 
-    if (rol === 'rider') {
+    if (role === 'rider') {
       const nombre = [first_name, last_name].filter(Boolean).join(' ')
         || email_addresses[0]?.email_address
         || 'Sin nombre';
@@ -76,7 +75,6 @@ export async function POST(req: Request) {
         create: { id, nombre },
       });
     } else {
-      // le sacaron el rol rider o tenía otro rol, lo marcamos inactivo si existía
       await prisma.usuario.updateMany({
         where: { id },
         data: { activo: false },

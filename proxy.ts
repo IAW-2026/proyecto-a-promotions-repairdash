@@ -10,25 +10,21 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  // Rutas públicas pasan directo
+
   if (isPublicRoute(req)) return;
 
   const { userId, sessionClaims } = await auth();
-  const rol = (sessionClaims?.metadata as { rol?: string })?.rol;
-  console.log('sessionClaims completo:', JSON.stringify(sessionClaims, null, 2));
-  console.log('rol:', rol);
-  // Si no está logueado, al login
+  const role = (sessionClaims?.metadata as { role?: string })?.role;
+
   if (!userId) {
     return NextResponse.redirect(new URL('/sign-in', req.url));
   }
 
-  // Si está logueado pero no tiene rol válido para esta app, al login
-  if (rol !== 'rider' && rol !== 'adminPromociones') {
+  if (role !== 'rider' && role !== 'admin-promotions') {
     return NextResponse.redirect(new URL('/sin-acceso', req.url));
   }
 
-  // Si es ruta admin y no es adminPromociones, al inicio
-  if (isAdminRoute(req) && rol !== 'adminPromociones') {
+  if (isAdminRoute(req) && role !== 'admin-promotions') {
     return NextResponse.redirect(new URL('/', req.url));
   }
 
