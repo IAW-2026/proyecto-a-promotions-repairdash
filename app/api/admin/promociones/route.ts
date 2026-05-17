@@ -1,4 +1,3 @@
-// app/api/admin/promociones/route.ts
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
