@@ -38,7 +38,7 @@ model Promocion {
   usoUnico       Boolean          @default(false)
   destacada      Boolean          @default(false)
   precioMinimo   Float?
-  categorias     String[]
+  categorias   String[]
   eliminada      Boolean          @default(false)
   filtroUsuarios Json?
   historial      HistorialDeUso[]
