@@ -39,6 +39,7 @@ export async function GET(req: Request) {
       precioMinimo: true,
       categorias: true,
       filtroUsuarios: true,
+      usoUnico: true,
     },
   });
 
@@ -46,12 +47,19 @@ export async function GET(req: Request) {
     todasLasPromos.map(async (promo) => {
       const califica = await usuarioCalifica(usuarioId, promo.filtroUsuarios as any);
       if (!califica) return null;
+      if (promo.usoUnico) {
+        const yaUsada = await prisma.historialDeUso.findFirst({
+          where: { promocionId: promo.id, usuarioId },
+        });
+        if (yaUsada) return null;
+      }
       return {
         ...promo,
         categorias: promo.categorias.map(
           (id) => tipos.find((t) => t.id === id)?.nombre ?? id
         ),
         filtroUsuarios: undefined,
+        usoUnico: undefined,
       };
     })
   );
