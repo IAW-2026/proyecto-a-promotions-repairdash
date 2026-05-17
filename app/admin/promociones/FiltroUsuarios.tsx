@@ -49,11 +49,7 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
   const [busqueda, setBusqueda] = useState('');
   const [filtro, setFiltro] = useState<FiltroUsuarios>(value ?? {});
   const [confirmando, setConfirmando] = useState<Modo | null>(null);
-  const [errores, setErrores] = useState({
-    despues: '',
-    antes: '',
-    usos: '',
-  });
+  const [errores, setErrores] = useState({ despues: '', antes: '', usos: '' });
 
   useEffect(() => {
     fetch('/api/admin/usuarios')
@@ -126,13 +122,13 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
       <label className="text-[#C392DD] text-sm font-semibold">¿Para qué usuarios aplica esta promoción?</label>
 
       {/* Selector de modo */}
-      <div className="flex gap-3 flex-wrap">
+      <div className="flex gap-2 flex-wrap">
         {modos.map(({ key, label }) => (
           <button
             key={key}
             type="button"
             onClick={() => handleModo(key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               modo === key
                 ? 'bg-[#F500F1] text-white'
                 : 'bg-[#271033] border border-[#8D62A5] text-[#FBDAF9] hover:border-[#F500F1]'
@@ -169,8 +165,9 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
       {/* Filtros */}
       {modo === 'filtros' && (
         <div className="flex flex-col gap-4 p-4 bg-[#271033] rounded-xl border border-[#8D62A5]">
-          <div className="flex gap-4">
-            <div className="flex flex-col gap-1 flex-1">
+          {/* Fechas — columna en mobile, fila en desktop */}
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col gap-1 w-full md:flex-1">
               <label className="text-[#C392DD] text-xs font-semibold">Registrados después de</label>
               <input
                 type="date"
@@ -195,12 +192,12 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
                   actualizar({ registradosDespuesDe: val });
                   actualizarErrores({ despues: '', antes: errores.antes === 'La fecha máxima no puede ser anterior a la mínima.' ? '' : errores.antes });
                 }}
-                className="bg-[#1b0422] border border-[#8D62A5] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#F500F1] [color-scheme:dark]"
+                className="w-full bg-[#1b0422] border border-[#8D62A5] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#F500F1] [color-scheme:dark]"
               />
               {errores.despues && <p className="text-red-400 text-xs">{errores.despues}</p>}
             </div>
 
-            <div className="flex flex-col gap-1 flex-1">
+            <div className="flex flex-col gap-1 w-full md:flex-1">
               <label className="text-[#C392DD] text-xs font-semibold">Registrados antes de</label>
               <input
                 type="date"
@@ -225,14 +222,15 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
                   actualizar({ registradosAntesDe: val });
                   actualizarErrores({ antes: '', despues: errores.despues === 'La fecha mínima no puede ser posterior a la máxima.' ? '' : errores.despues });
                 }}
-                className="bg-[#1b0422] border border-[#8D62A5] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#F500F1] [color-scheme:dark]"
+                className="w-full bg-[#1b0422] border border-[#8D62A5] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#F500F1] [color-scheme:dark]"
               />
               {errores.antes && <p className="text-red-400 text-xs">{errores.antes}</p>}
             </div>
           </div>
 
-          <div className="flex gap-4">
-            <div className="flex flex-col gap-1 flex-1">
+          {/* Usos — columna en mobile, fila en desktop */}
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col gap-1 w-full md:flex-1">
               <label className="text-[#C392DD] text-xs font-semibold">Mínimo de promociones usadas</label>
               <input
                 type="number"
@@ -247,10 +245,10 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
                     actualizarErrores({ usos: '' });
                   }
                 }}
-                className="bg-[#1b0422] border border-[#8D62A5] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#F500F1]"
+                className="w-full bg-[#1b0422] border border-[#8D62A5] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#F500F1]"
               />
             </div>
-            <div className="flex flex-col gap-1 flex-1">
+            <div className="flex flex-col gap-1 w-full md:flex-1">
               <label className="text-[#C392DD] text-xs font-semibold">Máximo de promociones usadas</label>
               <input
                 type="number"
@@ -265,7 +263,7 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
                     actualizarErrores({ usos: '' });
                   }
                 }}
-                className="bg-[#1b0422] border border-[#8D62A5] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#F500F1]"
+                className="w-full bg-[#1b0422] border border-[#8D62A5] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#F500F1]"
               />
             </div>
           </div>

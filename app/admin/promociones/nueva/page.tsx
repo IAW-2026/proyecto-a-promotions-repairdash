@@ -103,8 +103,8 @@ export default function NuevaPromocion() {
             </div>
 
             {/* Tipo de descuento + valor */}
-            <div className="flex gap-4">
-              <div className="flex flex-col gap-1 w-1/3">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex flex-col gap-1 md:w-1/3">
                 <label className="text-[#C392DD] text-sm font-semibold">Tipo</label>
                 <select
                   name="tipoDescuento"
@@ -113,7 +113,7 @@ export default function NuevaPromocion() {
                   className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1]"
                 >
                   <option value="%">% Porcentaje</option>
-                  <option value="$">$ Monto fijo</option>
+                  <option value="$">$ Monto de descuento</option>
                 </select>
               </div>
               <div className="flex flex-col gap-1 flex-1">
@@ -123,7 +123,7 @@ export default function NuevaPromocion() {
                   type="number"
                   value={form.valor}
                   onChange={handleChange}
-                  className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1]"
+                  className="w-full bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1]"
                 />
               </div>
             </div>
