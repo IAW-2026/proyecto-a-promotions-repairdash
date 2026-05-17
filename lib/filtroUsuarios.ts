@@ -1,4 +1,4 @@
-// lib/filtroUsuarios.ts
+
 import { prisma } from '@/lib/prisma';
 
 type FiltroUsuarios = {
@@ -10,7 +10,6 @@ type FiltroUsuarios = {
 };
 
 export async function usuarioCalifica(usuarioId: string, filtro: FiltroUsuarios | null): Promise<boolean> {
-  // si no hay filtro, es para todos
   if (!filtro) return true;
 
   const usuario = await prisma.usuario.findUnique({

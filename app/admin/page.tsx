@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 
 export default async function AdminDashboard() {
-  // Obtenemos datos rápidos para mostrar en el inicio
   const [totalPromos, totalUsos] = await Promise.all([
     prisma.promocion.count(),
     prisma.historialDeUso.count(),

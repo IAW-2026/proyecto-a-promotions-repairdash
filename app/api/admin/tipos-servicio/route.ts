@@ -1,4 +1,4 @@
-// app/api/admin/tipos-servicio/route.ts
+
 import { NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
 
@@ -18,7 +18,7 @@ export async function GET() {
     { id: '5', nombre: 'Albañilería', descripcion: 'Construcción, reparación y revestimiento de paredes y pisos.' },
   ];
 
-  // Cuando se conecten las apps, reemplazás el mock con esto:
+  // Cuando se conecten las apps, reemplazo el mock con esto:
   // const res = await fetch(`${process.env.DRIVER_APP_URL}/api/tipos-servicio`, {
   //   headers: { 'x-api-key': process.env.DRIVER_API_KEY! },
   // });

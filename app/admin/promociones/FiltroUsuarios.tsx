@@ -1,4 +1,4 @@
-// app/admin/promociones/FiltroUsuarios.tsx
+
 'use client';
 import { useEffect, useState } from 'react';
 

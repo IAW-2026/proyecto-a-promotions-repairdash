@@ -1,4 +1,3 @@
-// app/api/promociones/route.ts
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { usuarioCalifica } from '@/lib/filtroUsuarios';
@@ -22,7 +21,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Falta usuarioId' }, { status: 400 });
   }
 
-  // Traemos los tipos de servicio para resolver ids a nombres
   const tiposRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/tipos-servicio`, {
     headers: { 'x-api-key': process.env.RIDER_API_KEY! },
   });
