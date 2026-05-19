@@ -3,14 +3,33 @@ import HistorialDeUso from './components/HistorialDeUso';
 import CarruselPromociones from './components/Promociones';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@clerk/nextjs/server';
+import { usuarioCalifica } from '@/lib/filtroUsuarios';
 
 export default async function PaginaInicio() {
   const user = await currentUser();
   const nombreUsuario = user?.firstName ?? user?.emailAddresses[0].emailAddress ?? 'Usuario';
+  const ahora = new Date();
 
-  const promocionesActivas = await prisma.promocion.findMany({
-    where: { destacada: true, eliminada: false }
+  const todasLasPromos = await prisma.promocion.findMany({
+    where: { 
+      destacada: true, 
+      eliminada: false,
+      fechaInicio: { lte: ahora },
+      OR: [
+        { fechaFin: null },
+        { fechaFin: { gte: ahora } },
+      ],
+    },
   });
+
+  const promocionesActivas = (
+    await Promise.all(
+      todasLasPromos.map(async (promo) => {
+        const califica = await usuarioCalifica(user?.id ?? '', promo.filtroUsuarios as any);
+        return califica ? promo : null;
+      })
+    )
+  ).filter(Boolean);
 
   const historialPromociones = (
     await prisma.historialDeUso.findMany({
@@ -26,8 +45,6 @@ export default async function PaginaInicio() {
     <>
       <Header />
       <main className="flex min-h-screen flex-col p-4 md:p-8 pt-0 bg-[#271033] text-white w-full">
-
-        {/* Bienvenida */}
         <section className="text-center mb-12 mt-8">
           <h2 className="text-3xl font-bold text-[#C392DD] mb-4">
             ¡Hola, {nombreUsuario}!
@@ -37,15 +54,13 @@ export default async function PaginaInicio() {
           </p>
         </section>
 
-        {/* Promociones Activas */}
         <section className="mb-12">
           <h3 className="text-2xl font-bold text-[#F500F1] mb-6 text-center">
             Promociones Activas
           </h3>
-          <CarruselPromociones promociones={promocionesActivas} />
+          <CarruselPromociones promociones={promocionesActivas as any} />
         </section>
 
-        {/* Historial de Promociones */}
         <section className="mb-12">
           <h3 className="text-2xl font-bold text-[#F500F1] mb-6 text-center">
             Historial de Promociones Usadas
@@ -53,7 +68,6 @@ export default async function PaginaInicio() {
           <HistorialDeUso historial={historialPromociones} />
         </section>
 
-        {/* Footer */}
         <footer className="mt-16 text-center text-[#FBDAF9] text-sm">
           <p>RepairDash - Promociones</p>
         </footer>

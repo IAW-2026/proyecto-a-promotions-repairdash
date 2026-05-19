@@ -21,12 +21,8 @@ export default async function HistorialAdmin() {
     fechaUso: item.fechaUso.toLocaleDateString('es-AR'),
   }));
 
-  // --- Lógica de Métricas ---
-  
-  // 1. Cantidad de usuarios únicos (usando un Set para eliminar duplicados)
   const usuariosUnicos = new Set(historial.map(item => item.usuarioId)).size;
 
-  // 2. Promoción más usada
   const conteoPromos: Record<string, number> = {};
   historial.forEach(item => {
     conteoPromos[item.nombre] = (conteoPromos[item.nombre] || 0) + 1;

@@ -16,7 +16,6 @@ export async function PATCH(req: Request, { params }: Props) {
     const { id } = await params;
     const body = await req.json();
 
-    // Filtramos los datos para que Prisma no reciba campos que no conoce
     const { id: _id, ...datos } = body;
 
     const promo = await prisma.promocion.update({
@@ -25,7 +24,6 @@ export async function PATCH(req: Request, { params }: Props) {
         ...datos,
         valor: parseFloat(datos.valor),
         precioMinimo: datos.precioMinimo ? parseFloat(datos.precioMinimo) : null,
-        // Si categorías viene como string "a, b", lo convertimos a array si Prisma lo pide así
         categorias: typeof datos.categorias === 'string' 
           ? datos.categorias.split(',').map((c: string) => c.trim()) 
           : datos.categorias

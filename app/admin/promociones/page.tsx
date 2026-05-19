@@ -5,10 +5,11 @@ import { DeleteButton } from './DeleteButton';
 
 export default async function AdminPromociones() {
   const promociones = await prisma.promocion.findMany({
-    where: { eliminada: false },
+    where: { eliminada: false }, 
     include: { _count: { select: { historial: true } } },
     orderBy: { id: 'desc' },
   });
+  const ahora = new Date();
 
   return (
     <>
@@ -36,66 +37,159 @@ export default async function AdminPromociones() {
             </div>
 
             {/* Filas */}
-            {promociones.map((promo) => (
-              <div
-                key={promo.id}
-                className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] px-6 py-4 items-center bg-[#8D62A5] rounded-2xl border border-[#C392DD] hover:border-[#F500F1] transition-colors"
-              >
-                <div>
-                  <p className="text-white font-extrabold">{promo.nombre}</p>
-                  <p className="text-[#FBDAF9] text-xs mt-1">{promo.descripcion}</p>
+            {promociones.map((promo) => {
+              const inicio = new Date(promo.fechaInicio);
+              const fin = promo.fechaFin ? new Date(promo.fechaFin) : null;
+              const esFutura = inicio > ahora;
+              const esCaducada = fin !== null && fin < ahora;
+
+              let estiloEstado = "bg-[#8D62A5]"; 
+              if (esFutura) estiloEstado = "bg-[#8D62A5] opacity-75";
+              if (esCaducada) estiloEstado = "bg-[#8D62A5] opacity-50";
+
+              return (
+                <div
+                  key={promo.id}
+                  className={`grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] px-6 py-4 items-center rounded-2xl border border-[#C392DD] hover:border-[#F500F1] transition-all ${estiloEstado}`}
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-white font-extrabold">{promo.nombre}</p>
+                      
+                      {/* Carteles de Estado */}
+                      {esFutura && (
+                        <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-[#C392DD] text-white">
+                          Programada
+                        </span>
+                      )}
+                      {esCaducada && (
+                        <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-[#271033] text-white">
+                          Caducada
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[#FBDAF9] text-xs mt-1">{promo.descripcion}</p>
+                    
+                    {/* Información de fechas para el Admin */}
+                    {esFutura && (
+                      <p className="text-[#FBDAF9] text-xs font-semibold mt-1">
+                        Válida desde: {inicio.toLocaleDateString()} a las {inicio.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      </p>
+                    )}
+                    {esCaducada && fin && (
+                      <p className="text-[#C392DD] text-xs font-semibold mt-1">
+                        Venció el: {fin.toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+
+                  <span className="text-[#F500F1] font-bold">
+                    {promo.tipoDescuento}{promo.valor} off
+                  </span>
+                  
+                  <span className="text-[#FBDAF9]">
+                    {promo._count.historial} uso{promo._count.historial !== 1 ? 's' : ''}
+                  </span>
+                  
+                  <span className={promo.destacada ? 'text-[#F500F1] font-semibold' : 'text-[#FBDAF9]'}>
+                    {promo.destacada ? 'Sí' : 'No'}
+                  </span>
+
+                  {/* Sugerencias de acción al lado de los botones si caducó */}
+                  <div className="text-right text-[11px] text-[#FBDAF9] opacity-80 font-medium pr-2 max-w-[120px]">
+                    {esCaducada && "Sugerencia: Actualizá la fecha de vigencia o eliminá la promoción."}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Link
+                      href={`/admin/promociones/${promo.id}`}
+                      className="px-3 py-1 bg-[#271033] text-[#C392DD] rounded-lg text-sm hover:bg-[#C392DD] hover:text-white transition-colors flex items-center"
+                    >
+                      Editar
+                    </Link>
+                    <DeleteButton id={promo.id} usos={promo._count.historial} />
+                  </div>
                 </div>
-                <span className="text-[#F500F1] font-bold">
-                  {promo.tipoDescuento}{promo.valor} off
-                </span>
-                <span className="text-[#FBDAF9]">
-                  {promo._count.historial} uso{promo._count.historial !== 1 ? 's' : ''}
-                </span>
-                <span className={promo.destacada ? 'text-[#F500F1] font-semibold' : 'text-[#FBDAF9]'}>
-                  {promo.destacada ? 'Sí' : 'No'}
-                </span>
-                <div className="flex gap-2">
-                  <Link
-                    href={`/admin/promociones/${promo.id}`}
-                    className="px-3 py-1 bg-[#271033] text-[#C392DD] rounded-lg text-sm hover:bg-[#C392DD] hover:text-white transition-colors"
-                  >
-                    Editar
-                  </Link>
-                  <DeleteButton id={promo.id} usos={promo._count.historial} />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Cards — mobile */}
           <div className="flex flex-col gap-4 md:hidden">
-            {promociones.map((promo) => (
-              <div
-                key={promo.id}
-                className="p-5 bg-[#8D62A5] rounded-2xl border border-[#C392DD] flex flex-col gap-3"
-              >
-                <div className="flex justify-between items-start">
-                  <h3 className="text-white font-extrabold text-lg">{promo.nombre}</h3>
-                  <span className="text-[#F500F1] font-bold text-sm">{promo.tipoDescuento}{promo.valor} off</span>
+            {promociones.map((promo) => {
+              const inicio = new Date(promo.fechaInicio);
+              const fin = promo.fechaFin ? new Date(promo.fechaFin) : null;
+              const esFutura = inicio > ahora;
+              const esCaducada = fin !== null && fin < ahora;
+
+              let estiloEstado = "bg-[#8D62A5]";
+              if (esFutura) estiloEstado = "bg-[#8D62A5] opacity-80";
+              if (esCaducada) estiloEstado = "bg-[#8D62A5] opacity-60";
+
+              return (
+                <div
+                  key={promo.id}
+                  className={`p-5 rounded-2xl border border-[#C392DD] flex flex-col gap-3 ${estiloEstado}`}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-white font-extrabold text-lg">{promo.nombre}</h3>
+                        {esFutura && (
+                          <span className="px-2 py-0.5 text-[9px] font-bold uppercase rounded bg-[#C392DD] text-white">
+                            Programada
+                          </span>
+                        )}
+                        {esCaducada && (
+                          <span className="px-2 py-0.5 text-[9px] font-bold uppercase rounded bg-[#271033] text-white">
+                            Caducada
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[#FBDAF9] text-sm mt-1">{promo.descripcion}</p>
+                    </div>
+                    <span className="text-[#F500F1] font-bold text-sm shrink-0">
+                      {promo.tipoDescuento}{promo.valor} off
+                    </span>
+                  </div>
+
+                  {/* Fechas en mobile */}
+                  {esFutura && (
+                    <p className="text-[#FBDAF9] text-xs font-semibold">
+                      Activa desde: {inicio.toLocaleDateString()}
+                    </p>
+                  )}
+                  {esCaducada && fin && (
+                    <p className="text-[#C392DD] text-xs font-semibold">
+                      Venció el: {fin.toLocaleDateString()}
+                    </p>
+                  )}
+
+                  <div className="flex gap-4 text-sm">
+                    <span className="text-[#FBDAF9]">{promo._count.historial} usos</span>
+                    <span className={promo.destacada ? 'text-[#F500F1]' : 'text-[#FBDAF9]'}>
+                      {promo.destacada ? 'Destacada' : 'No destacada'}
+                    </span>
+                  </div>
+
+                  {esCaducada && (
+                    <p className="text-[#FBDAF9] opacity-80 text-xs italic bg-[#271033]/30 p-2 rounded-lg text-center">
+                      Sugerencia: actualizá la fecha de vigencia o eliminá la promoción.
+                    </p>
+                  )}
+
+                  <div className="flex gap-2 pt-2 border-t border-[#C392DD]">
+                    <Link
+                      href={`/admin/promociones/${promo.id}`}
+                      className="flex-1 text-center px-3 py-2 bg-[#271033] text-[#C392DD] rounded-lg text-sm hover:bg-[#C392DD] hover:text-white transition-colors"
+                    >
+                      Editar
+                    </Link>
+                    <DeleteButton id={promo.id} usos={promo._count.historial} />
+                  </div>
                 </div>
-                <p className="text-[#FBDAF9] text-sm">{promo.descripcion}</p>
-                <div className="flex gap-4 text-sm">
-                  <span className="text-[#FBDAF9]">{promo._count.historial} usos</span>
-                  <span className={promo.destacada ? 'text-[#F500F1]' : 'text-[#FBDAF9]'}>
-                    {promo.destacada ? '★ Destacada' : 'No destacada'}
-                  </span>
-                </div>
-                <div className="flex gap-2 pt-2 border-t border-[#C392DD]">
-                  <Link
-                    href={`/admin/promociones/${promo.id}`}
-                    className="flex-1 text-center px-3 py-2 bg-[#271033] text-[#C392DD] rounded-lg text-sm hover:bg-[#C392DD] hover:text-white transition-colors"
-                  >
-                    Editar
-                  </Link>
-                  <DeleteButton id={promo.id} usos={promo._count.historial} />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       </main>

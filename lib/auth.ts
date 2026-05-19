@@ -1,10 +1,10 @@
-// lib/auth.ts
+
 import { currentUser } from '@clerk/nextjs/server';
 
 export async function obtenerRol() {
   const user = await currentUser();
   if (!user) return null;
-  return (user.publicMetadata?.rol as string) ?? 'cliente';
+  return (user.publicMetadata?.role as string) ?? 'cliente';
 }
 
 export async function esAdmin() {

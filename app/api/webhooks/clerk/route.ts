@@ -1,4 +1,4 @@
-// app/api/webhooks/clerk/route.ts
+
 import { Webhook } from 'svix';
 import { headers } from 'next/headers';
 import { WebhookEvent } from '@clerk/nextjs/server';
@@ -20,8 +20,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Faltan headers de svix' }, { status: 400 });
   }
 
-  const payload = await req.json();
-  const body = JSON.stringify(payload);
+  const body = await req.text();
 
   const wh = new Webhook(WEBHOOK_SECRET);
   let evt: WebhookEvent;
@@ -38,9 +37,9 @@ export async function POST(req: Request) {
 
   if (evt.type === 'user.created') {
     const { id, first_name, last_name, email_addresses, public_metadata } = evt.data;
-    const rol = (public_metadata as { rol?: string })?.rol;
+    const role = (public_metadata as { role?: string })?.role;
 
-    if (rol === 'rider') {
+    if (role === 'rider') {
       const nombre = [first_name, last_name].filter(Boolean).join(' ')
         || email_addresses[0]?.email_address
         || 'Sin nombre';
@@ -63,9 +62,9 @@ export async function POST(req: Request) {
 
   if (evt.type === 'user.updated') {
     const { id, first_name, last_name, email_addresses, public_metadata } = evt.data;
-    const rol = (public_metadata as { rol?: string })?.rol;
+    const role = (public_metadata as { role?: string })?.role;
 
-    if (rol === 'rider') {
+    if (role === 'rider') {
       const nombre = [first_name, last_name].filter(Boolean).join(' ')
         || email_addresses[0]?.email_address
         || 'Sin nombre';
@@ -76,7 +75,6 @@ export async function POST(req: Request) {
         create: { id, nombre },
       });
     } else {
-      // le sacaron el rol rider o tenía otro rol, lo marcamos inactivo si existía
       await prisma.usuario.updateMany({
         where: { id },
         data: { activo: false },

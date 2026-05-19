@@ -2,6 +2,16 @@
 import Header from '../../../components/Header';
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
+import FiltroUsuariosSelector from '../FiltroUsuarios';
+import TiposServicioSelector from '../TipoServicioSelector';
+
+type FiltroUsuarios = {
+  idsEspecificos?: string[];
+  registradosDespuesDe?: string;
+  registradosAntesDe?: string;
+  minimoUsos?: number;
+  maximoUsos?: number;
+};
 
 type PromoForm = {
   nombre: string;
@@ -10,7 +20,6 @@ type PromoForm = {
   valor: string;
   descripcion: string;
   precioMinimo: string;
-  categorias: string;
   destacada: boolean;
   usoUnico: boolean;
 };
@@ -21,7 +30,18 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [error, setError] = useState('');
-  const [guardado, setGuardado] = useState(false); // Único estado agregado
+  const [guardado, setGuardado] = useState(false);
+  const [filtroUsuarios, setFiltroUsuarios] = useState<FiltroUsuarios | null>(null);
+  const [filtroConError, setFiltroConError] = useState(false);
+  const [categorias, setCategorias] = useState<string[]>([]);
+  
+  // Estados de fechas inicializados de forma segura
+  const [fechaInicio, setFechaInicio] = useState<string>(
+    new Date().toISOString().slice(0, 16)
+  );
+  const [tieneCaducidad, setTieneCaducidad] = useState<boolean>(false);
+  const [fechaFin, setFechaFin] = useState<string>('');
+
   const [form, setForm] = useState<PromoForm>({
     nombre: '',
     codigo: '',
@@ -29,7 +49,6 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
     valor: '',
     descripcion: '',
     precioMinimo: '',
-    categorias: '',
     destacada: false,
     usoUnico: false,
   });
@@ -45,10 +64,21 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
           valor: String(data.valor),
           descripcion: data.descripcion,
           precioMinimo: data.precioMinimo ? String(data.precioMinimo) : '',
-          categorias: data.categorias?.join(', ') ?? '',
           destacada: data.destacada,
           usoUnico: data.usoUnico,
         });
+        setCategorias(data.categorias ?? []);
+        setFiltroUsuarios(data.filtroUsuarios ?? null);
+
+        // Mapeo seguro de fechas desde la API al formato local del input
+        if (data.fechaInicio) {
+          setFechaInicio(new Date(data.fechaInicio).toISOString().slice(0, 16));
+        }
+        if (data.fechaFin) {
+          setTieneCaducidad(true);
+          setFechaFin(new Date(data.fechaFin).toISOString().slice(0, 16));
+        }
+
         setLoadingData(false);
       });
   }, [id]);
@@ -72,12 +102,15 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
         ...form,
         valor: parseFloat(form.valor),
         precioMinimo: form.precioMinimo ? parseFloat(form.precioMinimo) : null,
-        categorias: form.categorias ? form.categorias.split(',').map((c) => c.trim()) : [],
+        categorias,
+        filtroUsuarios: filtroUsuarios ?? null,
+        fechaInicio: new Date(fechaInicio).toISOString(),
+        fechaFin: tieneCaducidad && fechaFin ? new Date(fechaFin).toISOString() : null,
       }),
     });
 
     if (res.ok) {
-      setGuardado(true); // Se activa el cartel
+      setGuardado(true);
       setTimeout(() => {
         router.push('/admin/promociones');
         router.refresh();
@@ -138,8 +171,8 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
             </div>
 
             {/* Tipo de descuento + valor */}
-            <div className="flex gap-4">
-              <div className="flex flex-col gap-1 w-1/3">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex flex-col gap-1 md:w-1/3">
                 <label className="text-[#C392DD] text-sm font-semibold">Tipo</label>
                 <select
                   name="tipoDescuento"
@@ -148,7 +181,7 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
                   className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1]"
                 >
                   <option value="%">% Porcentaje</option>
-                  <option value="$">$ Monto fijo</option>
+                  <option value="$">$ Monto de descuento</option>
                 </select>
               </div>
               <div className="flex flex-col gap-1 flex-1">
@@ -158,7 +191,7 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
                   type="number"
                   value={form.valor}
                   onChange={handleChange}
-                  className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1]"
+                  className="w-full bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1]"
                 />
               </div>
             </div>
@@ -189,22 +222,54 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
               />
             </div>
 
-            {/* Categorías */}
-            <div className="flex flex-col gap-1">
-              <label className="text-[#C392DD] text-sm font-semibold">
-                Categorías <span className="text-[#8D62A5] font-normal">(separadas por coma)</span>
+            {/* Configuración de Vigencia Temporal */}
+            <div className="flex flex-col gap-4 pt-4 border-t border-[#8D62A5]">
+              <h3 className="text-[#C392DD] font-bold text-base">Vigencia por Fechas</h3>
+              
+              {/* Fecha de Inicio */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[#FBDAF9] text-sm font-semibold">Fecha de Inicio</label>
+                <input
+                  type="datetime-local"
+                  value={fechaInicio}
+                  onChange={(e) => setFechaInicio(e.target.value)}
+                  className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1] w-full [color-scheme:dark]"
+                />
+              </div>
+
+              {/* Checkbox de Caducidad */}
+              <label className="flex items-center gap-3 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={tieneCaducidad}
+                  onChange={(e) => setTieneCaducidad(e.target.checked)}
+                  className="w-4 h-4 accent-[#F500F1]"
+                />
+                <span className="text-[#FBDAF9] text-sm">¿Esta promoción tiene fecha de vencimiento?</span>
               </label>
-              <input
-                name="categorias"
-                value={form.categorias}
-                onChange={handleChange}
-                placeholder="plomería, electricidad, pintura"
-                className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1]"
-              />
+
+              {/* Input Condicional de Fecha de Fin */}
+              {tieneCaducidad && (
+                <div className="flex flex-col gap-1 pl-4 border-l-2 border-[#8D62A5]">
+                  <label className="text-[#FBDAF9] text-sm font-semibold">Fecha de Finalización</label>
+                  <input
+                    type="datetime-local"
+                    value={fechaFin}
+                    onChange={(e) => setFechaFin(e.target.value)}
+                    min={fechaInicio}
+                    className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1] w-full [color-scheme:dark]"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Tipos de servicio */}
+            <div className="pt-2 border-t border-[#8D62A5]">
+              <TiposServicioSelector value={categorias} onChange={setCategorias} />
             </div>
 
             {/* Checkboxes */}
-            <div className="flex flex-col gap-3 pt-2">
+            <div className="flex flex-col gap-3 pt-2 border-t border-[#8D62A5]">
               {[
                 { name: 'destacada', label: 'Destacada en el inicio' },
                 { name: 'usoUnico', label: 'Uso único por usuario' },
@@ -222,17 +287,25 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
               ))}
             </div>
 
-            {/* Cartel de éxito y errores */}
+            {/* Filtro de usuarios */}
+            <div className="pt-2 border-t border-[#8D62A5]">
+              <FiltroUsuariosSelector
+                value={filtroUsuarios}
+                onChange={setFiltroUsuarios}
+                onError={setFiltroConError}
+              />
+            </div>
+
             {guardado && (
               <p className="text-green-400 text-sm font-medium animate-pulse">
-                Cambios guardados con éxito!
+                ¡Cambios guardados con éxito!
               </p>
             )}
             {error && <p className="text-red-400 text-sm">{error}</p>}
 
             <button
               onClick={handleSubmit}
-              disabled={loading || guardado}
+              disabled={loading || guardado || filtroConError || categorias.length === 0}
               className="mt-2 px-6 py-3 bg-[#F500F1] text-white rounded-lg font-semibold hover:bg-[#c400c0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Guardando...' : guardado ? '¡Guardado!' : 'Guardar cambios'}

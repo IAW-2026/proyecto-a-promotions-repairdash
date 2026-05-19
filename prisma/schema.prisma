@@ -1,24 +1,18 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../app/generated/prisma"
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
 }
 
 model Usuario {
-  id                  String                @id
-  nombre              String
-  fechaRegistro       DateTime              @default(now())
-  historial           HistorialDeUso[]
-  promociones         UsuariosEnPromocion[]
-  activo              Boolean          @default(true)
+  id            String           @id
+  nombre        String
+  fechaRegistro DateTime         @default(now())
+  activo        Boolean          @default(true)
+  historial     HistorialDeUso[]
 }
 
 model HistorialDeUso {
@@ -26,36 +20,28 @@ model HistorialDeUso {
   fechaUso      DateTime  @default(now())
   nombre        String
   promocion     Promocion @relation(fields: [promocionId], references: [id])
-  promocionId   Int       
+  promocionId   Int
   usuario       Usuario   @relation(fields: [usuarioId], references: [id])
-  usuarioId     String       
+  usuarioId     String
   trabajoId     Int
   valorPagado   Float
   valorOriginal Float
 }
 
 model Promocion {
-  id            Int      @id @default(autoincrement())
-  nombre        String
-  codigo        String  
-  tipoDescuento String
-  valor         Float
-  descripcion   String
-  usoUnico      Boolean          @default(false)
-  destacada     Boolean          @default(false)
-  precioMinimo  Float?
-  categorias    String[]
-  historial     HistorialDeUso[]
-  usuarios      UsuariosEnPromocion[]
-  eliminada     Boolean  @default(false)
-}
-
-model UsuariosEnPromocion {
-  promocion   Promocion @relation(fields: [promocionId], references: [id])
-  promocionId Int
-  usuarioId   String
-  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
-  usado       Boolean   @default(false)
-  
-  @@id([promocionId, usuarioId])
+  id             Int              @id @default(autoincrement())
+  nombre         String
+  codigo         String
+  tipoDescuento  String
+  valor          Float
+  descripcion    String
+  usoUnico       Boolean          @default(false)
+  destacada      Boolean          @default(false)
+  precioMinimo   Float?
+  categorias   String[]
+  eliminada      Boolean          @default(false)
+  fechaInicio   DateTime          @default(now())
+  fechaFin      DateTime?
+  filtroUsuarios Json?
+  historial      HistorialDeUso[]
 }
