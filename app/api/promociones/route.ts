@@ -26,8 +26,16 @@ export async function GET(req: Request) {
   });
   const tipos: TipoServicio[] = tiposRes.ok ? await tiposRes.json() : [];
 
+  const ahora = new Date();
   const todasLasPromos = await prisma.promocion.findMany({
-    where: { eliminada: false },
+    where: {
+      eliminada: false,
+      fechaInicio: { lte: ahora },
+      OR: [
+        { fechaFin: null },
+        { fechaFin: { gte: ahora } },
+      ],
+    },
     select: {
       id: true,
       nombre: true,

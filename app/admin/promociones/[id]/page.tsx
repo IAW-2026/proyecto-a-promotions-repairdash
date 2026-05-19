@@ -34,6 +34,14 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
   const [filtroUsuarios, setFiltroUsuarios] = useState<FiltroUsuarios | null>(null);
   const [filtroConError, setFiltroConError] = useState(false);
   const [categorias, setCategorias] = useState<string[]>([]);
+  
+  // Estados de fechas inicializados de forma segura
+  const [fechaInicio, setFechaInicio] = useState<string>(
+    new Date().toISOString().slice(0, 16)
+  );
+  const [tieneCaducidad, setTieneCaducidad] = useState<boolean>(false);
+  const [fechaFin, setFechaFin] = useState<string>('');
+
   const [form, setForm] = useState<PromoForm>({
     nombre: '',
     codigo: '',
@@ -61,6 +69,16 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
         });
         setCategorias(data.categorias ?? []);
         setFiltroUsuarios(data.filtroUsuarios ?? null);
+
+        // Mapeo seguro de fechas desde la API al formato local del input
+        if (data.fechaInicio) {
+          setFechaInicio(new Date(data.fechaInicio).toISOString().slice(0, 16));
+        }
+        if (data.fechaFin) {
+          setTieneCaducidad(true);
+          setFechaFin(new Date(data.fechaFin).toISOString().slice(0, 16));
+        }
+
         setLoadingData(false);
       });
   }, [id]);
@@ -86,6 +104,8 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
         precioMinimo: form.precioMinimo ? parseFloat(form.precioMinimo) : null,
         categorias,
         filtroUsuarios: filtroUsuarios ?? null,
+        fechaInicio: new Date(fechaInicio).toISOString(),
+        fechaFin: tieneCaducidad && fechaFin ? new Date(fechaFin).toISOString() : null,
       }),
     });
 
@@ -200,6 +220,47 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
                 onChange={handleChange}
                 className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1]"
               />
+            </div>
+
+            {/* Configuración de Vigencia Temporal */}
+            <div className="flex flex-col gap-4 pt-4 border-t border-[#8D62A5]">
+              <h3 className="text-[#C392DD] font-bold text-base">Vigencia por Fechas</h3>
+              
+              {/* Fecha de Inicio */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[#FBDAF9] text-sm font-semibold">Fecha de Inicio</label>
+                <input
+                  type="datetime-local"
+                  value={fechaInicio}
+                  onChange={(e) => setFechaInicio(e.target.value)}
+                  className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1] w-full [color-scheme:dark]"
+                />
+              </div>
+
+              {/* Checkbox de Caducidad */}
+              <label className="flex items-center gap-3 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={tieneCaducidad}
+                  onChange={(e) => setTieneCaducidad(e.target.checked)}
+                  className="w-4 h-4 accent-[#F500F1]"
+                />
+                <span className="text-[#FBDAF9] text-sm">¿Esta promoción tiene fecha de vencimiento?</span>
+              </label>
+
+              {/* Input Condicional de Fecha de Fin */}
+              {tieneCaducidad && (
+                <div className="flex flex-col gap-1 pl-4 border-l-2 border-[#8D62A5]">
+                  <label className="text-[#FBDAF9] text-sm font-semibold">Fecha de Finalización</label>
+                  <input
+                    type="datetime-local"
+                    value={fechaFin}
+                    onChange={(e) => setFechaFin(e.target.value)}
+                    min={fechaInicio}
+                    className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1] w-full [color-scheme:dark]"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Tipos de servicio */}

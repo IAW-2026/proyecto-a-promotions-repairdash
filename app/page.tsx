@@ -8,9 +8,18 @@ import { usuarioCalifica } from '@/lib/filtroUsuarios';
 export default async function PaginaInicio() {
   const user = await currentUser();
   const nombreUsuario = user?.firstName ?? user?.emailAddresses[0].emailAddress ?? 'Usuario';
+  const ahora = new Date();
 
   const todasLasPromos = await prisma.promocion.findMany({
-    where: { destacada: true, eliminada: false },
+    where: { 
+      destacada: true, 
+      eliminada: false,
+      fechaInicio: { lte: ahora },
+      OR: [
+        { fechaFin: null },
+        { fechaFin: { gte: ahora } },
+      ],
+    },
   });
 
   const promocionesActivas = (
