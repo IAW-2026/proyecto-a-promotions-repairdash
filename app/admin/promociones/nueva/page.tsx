@@ -21,10 +21,12 @@ export default function NuevaPromocion() {
   const [filtroConError, setFiltroConError] = useState(false);
   const [categorias, setCategorias] = useState<string[]>([]);
   
-  // Estados nuevos agregados exclusivamente para el control de fechas de vigencia
-  const [fechaInicio, setFechaInicio] = useState<string>(
-    new Date().toISOString().slice(0, 16)
-  );
+  const [fechaInicio, setFechaInicio] = useState<string>(() => {
+    const d = new Date();
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+  });
   const [tieneCaducidad, setTieneCaducidad] = useState<boolean>(false);
   const [fechaFin, setFechaFin] = useState<string>('');
 

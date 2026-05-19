@@ -35,10 +35,12 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
   const [filtroConError, setFiltroConError] = useState(false);
   const [categorias, setCategorias] = useState<string[]>([]);
   
-  // Estados de fechas inicializados de forma segura
-  const [fechaInicio, setFechaInicio] = useState<string>(
-    new Date().toISOString().slice(0, 16)
-  );
+  const [fechaInicio, setFechaInicio] = useState<string>(() => {
+    const d = new Date();
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+  });
   const [tieneCaducidad, setTieneCaducidad] = useState<boolean>(false);
   const [fechaFin, setFechaFin] = useState<string>('');
 
@@ -70,13 +72,22 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
         setCategorias(data.categorias ?? []);
         setFiltroUsuarios(data.filtroUsuarios ?? null);
 
-        // Mapeo seguro de fechas desde la API al formato local del input
         if (data.fechaInicio) {
-          setFechaInicio(new Date(data.fechaInicio).toISOString().slice(0, 16));
+          const d = new Date(data.fechaInicio);
+          setFechaInicio(
+            new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+              .toISOString()
+              .slice(0, 16)
+          );
         }
         if (data.fechaFin) {
           setTieneCaducidad(true);
-          setFechaFin(new Date(data.fechaFin).toISOString().slice(0, 16));
+          const d = new Date(data.fechaFin);
+          setFechaFin(
+            new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+              .toISOString()
+              .slice(0, 16)
+          );
         }
 
         setLoadingData(false);
