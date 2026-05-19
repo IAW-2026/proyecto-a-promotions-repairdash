@@ -5,9 +5,17 @@ import { usuarioCalifica } from '@/lib/filtroUsuarios';
 
 export default async function PaginaPromociones() {
   const user = await currentUser();
+  const ahora = new Date();
 
   const todasLasPromos = await prisma.promocion.findMany({
-    where: { eliminada: false },
+    where: { 
+      eliminada: false,
+      fechaInicio: { lte: ahora },
+      OR: [
+        { fechaFin: null },
+        { fechaFin: { gte: ahora } },
+      ],
+     },
   });
 
   const promociones = (

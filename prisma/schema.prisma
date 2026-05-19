@@ -40,6 +40,8 @@ model Promocion {
   precioMinimo   Float?
   categorias   String[]
   eliminada      Boolean          @default(false)
+  fechaInicio   DateTime          @default(now())
+  fechaFin      DateTime?
   filtroUsuarios Json?
   historial      HistorialDeUso[]
 }
