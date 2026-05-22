@@ -1,4 +1,4 @@
-import Header from '../components/Header';
+import Header from '../componentes/Header';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import TarjetaMetrica from './TarjetaMetrica';

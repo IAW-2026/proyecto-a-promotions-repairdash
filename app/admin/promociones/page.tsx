@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Header from '../../components/Header';
+import Header from '../../componentes/Header';
 import { prisma } from '@/lib/prisma';
 import { DeleteButton } from './DeleteButton';
 

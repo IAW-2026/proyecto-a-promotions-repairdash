@@ -1,4 +1,4 @@
-import Header from '../../components/Header';
+import Header from '../../componentes/Header';
 import { prisma } from '@/lib/prisma';
 
 type ItemHistorial = {

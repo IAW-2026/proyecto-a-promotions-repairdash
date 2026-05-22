@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import Link from 'next/link';
+import Image from 'next/image';
 
 type Promocion = {
   id: number;
@@ -12,7 +13,7 @@ type Promocion = {
 
 function CartaPromocion({ promo }: { promo: Promocion }) {
   return (
-    <div className="w-[320px] flex-shrink-0 snap-start p-6 bg-[#8D62A5] rounded-2xl shadow-lg border border-[#C392DD] hover:border-[#F500F1] transition-colors">     
+    <div className="w-[320px] flex-shrink-0 snap-start p-6 bg-[#8D62A5] rounded-2xl shadow-lg border border-[#C392DD] hover:border-[#F500F1] transition-colors">
       <h4 className="text-xl font-bold text-white mb-2">{promo.nombre}</h4>
       <p className="text-[#FBDAF9] mb-1">
         <span className="font-semibold text-[#F500F1]">
@@ -34,23 +35,23 @@ export default function CarruselPromociones({ promociones }: { promociones: Prom
 
   return (
     <div className="flex flex-col md:flex-row gap-6">
-      <div className="hidden md:flex flex-1 flex-col justify-center bg-[#1b0422] rounded-2xl p-8">
-        <h4 className="text-3xl font-bold text-[#F500F1] mb-4">
-          ¡Explora las promociones para vos!
-        </h4>
-        <p className="text-[#FBDAF9] text-lg leading-8">
-          Copiá el código de descuento y utilizalo en tu próximo servicio.
-        </p>
+      <div className="hidden md:flex flex-1 relative rounded-2xl overflow-hidden min-h-[260px]">
+        <Image
+          src="/ImagenCuponDescuento.png"
+          alt="Cupón de descuento"
+          fill
+          className="object-cover"
+        />
       </div>
 
       <div className="flex-1 min-w-0 relative">
-        {/* Flechas — solo desktop */}
+        {/* Flecha izquierda */}
         <button
           onClick={() => scroll("left")}
-          className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-[#8D62A5] hover:bg-[#F500F1] rounded-full p-2 transition-colors shadow-lg"
+          className="hidden md:flex absolute left-0 top-1/2 -translate-y-2/3 -translate-x-4 z-10 text-[#C392DD] hover:text-white transition-colors"
           aria-label="Anterior"
         >
-          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -64,15 +65,17 @@ export default function CarruselPromociones({ promociones }: { promociones: Prom
           ))}
         </div>
 
+        {/* Flecha derecha */}
         <button
           onClick={() => scroll("right")}
-          className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-[#8D62A5] hover:bg-[#F500F1] rounded-full p-2 transition-colors shadow-lg"
+          className="hidden md:flex absolute right-0 top-1/2 -translate-y-2/3 translate-x-4 z- text-[#C392DD] hover:text-white transition-colors"
           aria-label="Siguiente"
         >
-          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
+
         <div className="text-right mt-4">
           <Link href="/promociones" className="px-4 py-2 bg-transparent border border-[#C392DD] text-[#C392DD] rounded-lg hover:bg-[#C392DD] hover:text-white transition-colors text-sm font-medium">
             Ver todas las promociones →
