@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -65,10 +65,9 @@ export default function CarruselPromociones({ promociones }: { promociones: Prom
           ))}
         </div>
 
-        {/* Flecha derecha */}
         <button
           onClick={() => scroll("right")}
-          className="hidden md:flex absolute right-0 top-1/2 -translate-y-2/3 translate-x-4 z- text-[#C392DD] hover:text-white transition-colors"
+          className="hidden md:flex absolute right-0 top-1/2 -translate-y-2/3 translate-x-4 z-10 text-[#C392DD] hover:text-white transition-colors"
           aria-label="Siguiente"
         >
           <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
