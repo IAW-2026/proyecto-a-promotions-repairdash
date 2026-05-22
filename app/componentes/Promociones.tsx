@@ -14,9 +14,9 @@ type Promocion = {
 function CartaPromocion({ promo }: { promo: Promocion }) {
   return (
     <div className="w-[320px] flex-shrink-0 snap-start p-6 bg-[#8D62A5] rounded-2xl shadow-lg border border-[#C392DD] hover:border-[#F500F1] transition-colors">
-      <h4 className="text-xl font-bold text-white mb-2">{promo.nombre}</h4>
+      <h4 className="text-xl font-extrabold text-white mb-2">{promo.nombre}</h4>
       <p className="text-[#FBDAF9] mb-1">
-        <span className="font-semibold text-[#F500F1]">
+        <span className="font-semibold text-[#F500F1] bg-[#271033] px-2 py-1 rounded">
           {promo.tipoDescuento}{promo.valor} off
         </span>
       </p>
@@ -37,7 +37,7 @@ export default function CarruselPromociones({ promociones }: { promociones: Prom
     <div className="flex flex-col md:flex-row gap-6">
       <div className="hidden md:flex flex-1 relative rounded-2xl overflow-hidden min-h-[260px]">
         <Image
-          src="/ImagenCuponDescuento.png"
+          src="/ImagenInicioDescuento.png"
           alt="Cupón de descuento"
           fill
           className="object-cover"
