@@ -1,5 +1,5 @@
 'use client';
-import Header from '../../../components/Header';
+import Header from '../../../componentes/Header';
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import FiltroUsuariosSelector from '../FiltroUsuarios';
@@ -15,7 +15,6 @@ type FiltroUsuarios = {
 
 type PromoForm = {
   nombre: string;
-  codigo: string;
   tipoDescuento: string;
   valor: string;
   descripcion: string;
@@ -46,7 +45,6 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
 
   const [form, setForm] = useState<PromoForm>({
     nombre: '',
-    codigo: '',
     tipoDescuento: '%',
     valor: '',
     descripcion: '',
@@ -61,7 +59,6 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
       .then((data) => {
         setForm({
           nombre: data.nombre,
-          codigo: data.codigo,
           tipoDescuento: data.tipoDescuento,
           valor: String(data.valor),
           descripcion: data.descripcion,
@@ -169,18 +166,7 @@ export default function EditarPromocion({ params }: { params: Promise<{ id: stri
                 className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1]"
               />
             </div>
-
-            {/* Código */}
-            <div className="flex flex-col gap-1">
-              <label className="text-[#C392DD] text-sm font-semibold">Código</label>
-              <input
-                name="codigo"
-                value={form.codigo}
-                onChange={handleChange}
-                className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white font-mono focus:outline-none focus:border-[#F500F1]"
-              />
-            </div>
-
+            
             {/* Tipo de descuento + valor */}
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex flex-col gap-1 md:w-1/3">

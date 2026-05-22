@@ -39,7 +39,6 @@ export async function GET(req: Request) {
     select: {
       id: true,
       nombre: true,
-      codigo: true,
       tipoDescuento: true,
       valor: true,
       precioMinimo: true,

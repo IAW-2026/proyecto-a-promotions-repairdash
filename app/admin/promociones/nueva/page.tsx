@@ -1,5 +1,5 @@
 'use client';
-import Header from '../../../components/Header';
+import Header from '../../../componentes/Header';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import FiltroUsuariosSelector from '../FiltroUsuarios';
@@ -32,7 +32,6 @@ export default function NuevaPromocion() {
 
   const [form, setForm] = useState({
     nombre: '',
-    codigo: '',
     tipoDescuento: '%',
     valor: '',
     descripcion: '',
@@ -101,17 +100,6 @@ export default function NuevaPromocion() {
                 value={form.nombre}
                 onChange={handleChange}
                 className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1]"
-              />
-            </div>
-
-            {/* Código */}
-            <div className="flex flex-col gap-1">
-              <label className="text-[#C392DD] text-sm font-semibold">Código</label>
-              <input
-                name="codigo"
-                value={form.codigo}
-                onChange={handleChange}
-                className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white font-mono focus:outline-none focus:border-[#F500F1]"
               />
             </div>
 

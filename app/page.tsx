@@ -1,6 +1,6 @@
-import Header from './components/Header';
-import HistorialDeUso from './components/HistorialDeUso';
-import CarruselPromociones from './components/Promociones';
+import Header from './componentes/Header';
+import HistorialDeUso from './componentes/HistorialDeUso';
+import CarruselPromociones from './componentes/Promociones';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@clerk/nextjs/server';
 import { usuarioCalifica } from '@/lib/filtroUsuarios';
@@ -50,13 +50,13 @@ export default async function PaginaInicio() {
             ¡Hola, {nombreUsuario}!
           </h2>
           <p className="text-[#FBDAF9]">
-            Bienvenido a tu panel de promociones, explorá las ofertas disponibles.
+            Bienvenido a tu panel de promociones.
           </p>
         </section>
 
         <section className="mb-12">
           <h3 className="text-2xl font-bold text-[#F500F1] mb-6 text-center">
-            Promociones Activas
+            ¡Explorá las ofertas exclusivas para vos!
           </h3>
           <CarruselPromociones promociones={promocionesActivas as any} />
         </section>

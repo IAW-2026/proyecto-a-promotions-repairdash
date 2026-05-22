@@ -31,7 +31,6 @@ model HistorialDeUso {
 model Promocion {
   id             Int              @id @default(autoincrement())
   nombre         String
-  codigo         String
   tipoDescuento  String
   valor          Float
   descripcion    String
