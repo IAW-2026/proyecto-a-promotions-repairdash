@@ -8,19 +8,9 @@ type Promocion = {
   tipoDescuento: string;
   valor: number;
   descripcion: string;
-  codigo: string;
 };
 
 function CartaPromocion({ promo }: { promo: Promocion }) {
-  const [copiado, setCopiado] = useState(false);
-  const codigo = promo.codigo.toUpperCase().replace(/\s/g, "");
-
-  const copiar = () => {
-    navigator.clipboard.writeText(codigo);
-    setCopiado(true);
-    setTimeout(() => setCopiado(false), 2000);
-  };
-
   return (
     <div className="w-[320px] flex-shrink-0 snap-start p-6 bg-[#8D62A5] rounded-2xl shadow-lg border border-[#C392DD] hover:border-[#F500F1] transition-colors">     
       <h4 className="text-xl font-bold text-white mb-2">{promo.nombre}</h4>
@@ -30,28 +20,6 @@ function CartaPromocion({ promo }: { promo: Promocion }) {
         </span>
       </p>
       <p className="text-[#FBDAF9] mb-4 break-words whitespace-normal">{promo.descripcion}</p>
-      {/* Código con botón copiar */}
-      <div className="flex items-center gap-2 bg-[#271033] rounded-lg px-3 py-2 mb-4">
-        <span className="font-mono text-sm text-[#F500F1] flex-1 tracking-widest">
-          {codigo}
-        </span>
-        <button
-          onClick={copiar}
-          className="text-[#C392DD] hover:text-white transition-colors"
-          aria-label="Copiar código"
-        >
-          {copiado ? (
-            <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          ) : (
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-          )}
-        </button>
-      </div>
     </div>
   );
 }
