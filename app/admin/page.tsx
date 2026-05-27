@@ -124,6 +124,9 @@ export default async function AdminDashboard() {
           <footer className="mt-8 text-center">
             <div className="inline-block p-4 bg-[#1b0422] rounded-2xl border border-[#8D62A5]/30">
               <p className="text-[#8D62A5] text-xs">RepairDash - Promociones</p>
+              <p> Fecha local: {new Date().toString()}</p>
+              <p> Fecha UTC: {new Date().toUTCString()} </p>
+              <p> Fecha ISO: {new Date().toISOString()} </p> 
             </div>
           </footer>
         </section>
