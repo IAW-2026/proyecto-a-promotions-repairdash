@@ -1,4 +1,4 @@
-import FormularioPromocion from '../FormularioPromocion';
+import FormularioPromocion from '../componentes/FormularioPromocion';
 
 export default async function EditarPromocion({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
