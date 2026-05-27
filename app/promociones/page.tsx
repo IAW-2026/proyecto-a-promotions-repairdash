@@ -2,20 +2,26 @@ import Header from '../componentes/Header';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@clerk/nextjs/server';
 import { usuarioCalifica } from '@/lib/filtroUsuarios';
+import Paginacion from '../componentes/Paginacion';
 
-export default async function PaginaPromociones() {
+const POR_PAGINA = 6;
+
+export default async function PaginaPromociones({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page } = await searchParams;
+  const paginaActual = Math.max(1, parseInt(page ?? '1'));
   const user = await currentUser();
   const ahora = new Date();
 
   const todasLasPromos = await prisma.promocion.findMany({
-    where: { 
+    where: {
       eliminada: false,
       fechaInicio: { lte: ahora },
-      OR: [
-        { fechaFin: null },
-        { fechaFin: { gte: ahora } },
-      ],
-     },
+      OR: [{ fechaFin: null }, { fechaFin: { gte: ahora } }],
+    },
   });
 
   const promociones = (
@@ -27,6 +33,10 @@ export default async function PaginaPromociones() {
     )
   ).filter(Boolean);
 
+  const totalPaginas = Math.ceil(promociones.length / POR_PAGINA);
+  const inicio = (paginaActual - 1) * POR_PAGINA;
+  const paginadas = promociones.slice(inicio, inicio + POR_PAGINA);
+
   return (
     <>
       <Header />
@@ -36,14 +46,13 @@ export default async function PaginaPromociones() {
             Todas las Promociones
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {promociones.map((promo) => (
+            {paginadas.map((promo) => (
               <div key={promo!.id} className="p-6 bg-[#8D62A5] rounded-2xl border border-[#C392DD] flex flex-col gap-3">
                 <h3 className="text-xl font-bold text-white">{promo!.nombre}</h3>
                 <p className="text-[#F500F1] font-semibold text-lg">
                   {promo!.tipoDescuento}{promo!.valor} off
                 </p>
                 <p className="text-[#FBDAF9]">{promo!.descripcion}</p>
-
                 {promo!.categorias.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {promo!.categorias.map((cat) => (
@@ -53,19 +62,16 @@ export default async function PaginaPromociones() {
                     ))}
                   </div>
                 )}
-
                 {promo!.precioMinimo && (
-                  <p className="text-[#FBDAF9] text-sm">
-                    Precio mínimo: ${promo!.precioMinimo}
-                  </p>
+                  <p className="text-[#FBDAF9] text-sm">Precio mínimo: ${promo!.precioMinimo}</p>
                 )}
-
                 <p className="text-[#FBDAF9] text-sm">
                   {promo!.filtroUsuarios ? 'Promoción exclusiva para algunos usuarios' : 'Disponible para todos'}
                 </p>
               </div>
             ))}
           </div>
+          <Paginacion paginaActual={paginaActual} totalPaginas={totalPaginas} basePath="/promociones" />
         </section>
       </main>
     </>

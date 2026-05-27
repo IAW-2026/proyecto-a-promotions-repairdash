@@ -2,12 +2,27 @@ import Link from 'next/link';
 import Header from '../../componentes/Header';
 import { prisma } from '@/lib/prisma';
 import { DeleteButton } from './DeleteButton';
+import Paginacion from '../../componentes/Paginacion';
 
-export default async function AdminPromociones() {
+const POR_PAGINA = 6;
+
+export default async function AdminPromociones({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page } = await searchParams;
+  const paginaActual = Math.max(1, parseInt(page ?? '1'));
+
+  const total = await prisma.promocion.count({ where: { eliminada: false } });
+  const totalPaginas = Math.ceil(total / POR_PAGINA);
+
   const promociones = await prisma.promocion.findMany({
-    where: { eliminada: false }, 
+    where: { eliminada: false },
     include: { _count: { select: { historial: true } } },
     orderBy: { id: 'desc' },
+    skip: (paginaActual - 1) * POR_PAGINA,
+    take: POR_PAGINA,
   });
   const ahora = new Date();
 
@@ -191,6 +206,11 @@ export default async function AdminPromociones() {
               );
             })}
           </div>
+          <Paginacion 
+            paginaActual={paginaActual} 
+            totalPaginas={totalPaginas} 
+            basePath="/admin/promociones" 
+          />
         </section>
       </main>
     </>
