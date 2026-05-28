@@ -319,7 +319,7 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
           ) : usuariosFiltrados.length === 0 ? (
             <p className="text-[#8D62A5] text-sm">No se encontraron usuarios.</p>
           ) : (
-            <div className="flex flex-col gap-1 max-h-52 overflow-y-auto pr-1">
+            <div className="flex flex-col gap-1 min-h-24 h-52 overflow-y-auto pr-1">
               {usuariosFiltrados.map((u) => (
                 <label
                   key={u.id}
