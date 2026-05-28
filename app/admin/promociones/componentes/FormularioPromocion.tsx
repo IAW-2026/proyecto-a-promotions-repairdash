@@ -173,11 +173,6 @@ export default function FormularioPromocion(props: Props) {
   useEffect(() => {
     if (!filtroConError) {
       setErrores((prev) => { const n = { ...prev }; delete n.filtroUsuarios; return n; });
-    } else {
-      setErrores((prev) => ({
-        ...prev,
-        filtroUsuarios: 'Si filtrás por usuarios tenés que definir al menos un criterio o seleccionar al menos un usuario.',
-      }));
     }
   }, [filtroConError]);
 
