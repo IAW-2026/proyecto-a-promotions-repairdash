@@ -1,4 +1,3 @@
-
 'use client';
 import { useEffect, useState } from 'react';
 
@@ -57,10 +56,29 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
       .then(setUsuarios);
   }, []);
 
+  // Validación de modo sin criterios
+  useEffect(() => {
+    if (modo === 'todos') {
+      onError(false);
+      return;
+    }
+
+    const hayErroresInternos = Object.values(errores).some((e) => e !== '');
+
+    if (modo === 'filtros') {
+      onError(hayErroresInternos || !tieneCriterios(filtro));
+      return;
+    }
+
+    if (modo === 'especificos') {
+      onError(hayErroresInternos || !tieneEspecificos(filtro));
+      return;
+    }
+  }, [modo, filtro, errores]);
+
   const actualizarErrores = (nuevos: Partial<typeof errores>) => {
     const merged = { ...errores, ...nuevos };
     setErrores(merged);
-    onError(Object.values(merged).some((e) => e !== ''));
   };
 
   const actualizar = (cambios: Partial<FiltroUsuarios>) => {
@@ -93,7 +111,6 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
     setBusqueda('');
     setConfirmando(null);
     setErrores({ despues: '', antes: '', usos: '' });
-    onError(false);
     onChange(nuevoModo === 'todos' ? null : {});
   };
 
@@ -121,7 +138,6 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
     <div className="flex flex-col gap-4">
       <label className="text-[#C392DD] text-sm font-semibold">¿Para qué usuarios aplica esta promoción?</label>
 
-      {/* Selector de modo */}
       <div className="flex gap-2 flex-wrap">
         {modos.map(({ key, label }) => (
           <button
@@ -139,7 +155,6 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
         ))}
       </div>
 
-      {/* Cartel de confirmación */}
       {confirmando && (
         <div className="flex flex-col gap-3 p-4 bg-[#1b0422] rounded-xl border border-[#F500F1]">
           <p className="text-[#FBDAF9] text-sm">{mensajeConfirmacion()}</p>
@@ -162,10 +177,11 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
         </div>
       )}
 
-      {/* Filtros */}
       {modo === 'filtros' && (
         <div className="flex flex-col gap-4 p-4 bg-[#271033] rounded-xl border border-[#8D62A5]">
-          {/* Fechas — columna en mobile, fila en desktop */}
+          {!tieneCriterios(filtro) && (
+            <p className="text-red-400 text-xs">Tenés que definir al menos un criterio de filtro.</p>
+          )}
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex flex-col gap-1 w-full md:flex-1">
               <label className="text-[#C392DD] text-xs font-semibold">Registrados después de</label>
@@ -228,7 +244,6 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
             </div>
           </div>
 
-          {/* Usos — columna en mobile, fila en desktop */}
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex flex-col gap-1 w-full md:flex-1">
               <label className="text-[#C392DD] text-xs font-semibold">Mínimo de promociones usadas</label>
@@ -271,9 +286,11 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
         </div>
       )}
 
-      {/* Usuarios específicos */}
       {modo === 'especificos' && (
         <div className="flex flex-col gap-3 p-4 bg-[#271033] rounded-xl border border-[#8D62A5]">
+          {!tieneEspecificos(filtro) && (
+            <p className="text-red-400 text-xs">Tenés que seleccionar al menos un usuario.</p>
+          )}
           <div className="relative">
             <svg
               className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8D62A5]"
