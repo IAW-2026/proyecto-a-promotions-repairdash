@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Header from '../../componentes/Header';
 import { prisma } from '@/lib/prisma';
-import { DeleteButton } from './DeleteButton';
+import { DeleteButton } from './componentes/DeleteButton';
 import Paginacion from '../../componentes/Paginacion';
 
 const POR_PAGINA = 6;

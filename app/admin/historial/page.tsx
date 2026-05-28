@@ -78,7 +78,6 @@ export default async function HistorialAdmin({
             Análisis de rendimiento y uso de promociones.
           </p>
 
-          {/* KPIs con Datos Reales e Históricos */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 items-stretch">
             <div className="p-6 bg-[#1b0422] rounded-2xl border border-[#C392DD] text-center flex flex-col justify-center">
               <p className="text-[#FBDAF9] text-sm font-medium uppercase tracking-wider mb-2">Usuarios Activos</p>

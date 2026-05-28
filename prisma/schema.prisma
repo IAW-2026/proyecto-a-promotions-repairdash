@@ -33,14 +33,14 @@ model Promocion {
   nombre         String
   tipoDescuento  String
   valor          Float
-  descripcion    String
+  descripcion    String?
   usoUnico       Boolean          @default(false)
   destacada      Boolean          @default(false)
   precioMinimo   Float?
-  categorias   String[]
+  categorias     String[]
   eliminada      Boolean          @default(false)
-  fechaInicio   DateTime          @default(now())
-  fechaFin      DateTime?
+  fechaInicio    DateTime          @default(now())
+  fechaFin       DateTime?
   filtroUsuarios Json?
   historial      HistorialDeUso[]
 }
