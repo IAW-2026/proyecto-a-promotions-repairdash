@@ -44,86 +44,93 @@ export default async function AdminPromociones({
           </div>
 
           <div className="hidden md:flex flex-col gap-3">
-            {/* Header tabla */}
-            <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] px-6 py-3">
+            <div className="grid grid-cols-[1.7fr_0.9fr_0.8fr_1fr_0.3fr] px-6 py-3">
               {["Nombre", "Descuento", "Usos", "Destacada", "Acciones"].map((col) => (
                 <span key={col} className="text-[#C392DD] text-sm font-semibold">{col}</span>
               ))}
             </div>
 
-            {/* Filas */}
             {promociones.map((promo) => {
               const inicio = new Date(promo.fechaInicio);
               const fin = promo.fechaFin ? new Date(promo.fechaFin) : null;
               const esFutura = inicio > ahora;
               const esCaducada = fin !== null && fin < ahora;
 
-              let estiloEstado = "bg-[#8D62A5]"; 
-              if (esFutura) estiloEstado = "bg-[#8D62A5] opacity-75";
-              if (esCaducada) estiloEstado = "bg-[#8D62A5] opacity-50";
+              let colorFondoFila = "bg-[#8D62A5]"; 
+              if (esFutura) colorFondoFila = "bg-[#6b4582]"; 
+              if (esCaducada) colorFondoFila = "bg-[#431b54]"; 
 
               return (
                 <div
                   key={promo.id}
-                  className={`grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] px-6 py-4 items-center rounded-2xl border border-[#C392DD] hover:border-[#F500F1] transition-all ${estiloEstado}`}
+                  className={`flex flex-col p-4 rounded-2xl border border-[#C392DD] hover:border-[#F500F1] transition-all gap-3 ${colorFondoFila}`}
                 >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-white font-extrabold">{promo.nombre}</p>
-                      
-                      {/* Carteles de Estado */}
-                      {esFutura && (
-                        <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-[#C392DD] text-white">
-                          Programada
-                        </span>
-                      )}
-                      {esCaducada && (
-                        <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-[#271033] text-white">
-                          Caducada
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[#FBDAF9] text-xs mt-1">{promo.descripcion}</p>
+                  <div className="grid grid-cols-[2fr_1fr_1fr_1fr_auto] px-2 items-center w-full">
                     
-                    {/* Información de fechas para el Admin */}
-                    {esFutura && (
-                      <p className="text-[#FBDAF9] text-xs font-semibold mt-1">
-                        Válida desde: {inicio.toLocaleDateString()} a las {inicio.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                      </p>
-                    )}
-                    {esCaducada && fin && (
-                      <p className="text-[#C392DD] text-xs font-semibold mt-1">
-                        Venció el: {fin.toLocaleDateString()}
-                      </p>
-                    )}
+                    <div className="grid grid-cols-[2fr_1fr_1fr_1fr] items-center col-span-4 gap-6">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className=" text-white font-extrabold text-lg">{promo.nombre}</p>
+                          
+                          {esFutura && (
+                            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-[#C392DD] text-white">
+                              Programada
+                            </span>
+                          )}
+                          {esCaducada && (
+                            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-[#271033] text-white">
+                              Caducada
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[#FBDAF9] text-[13px] mt-1">{promo.descripcion}</p>
+                        
+                        {esFutura && (
+                          <p className="text-[#FBDAF9] text-s font-semibold mt-1">
+                            Válida desde: {inicio.toLocaleDateString()} a las {inicio.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          </p>
+                        )}
+                        {esCaducada && fin && (
+                          <p className="text-[#C392DD] text-s font-semibold mt-1">
+                            Venció el: {fin.toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+
+                      <span className="inline-flex items-center bg-[#271033] text-[#F500F1] font-bold px-3 py-1 rounded-md w-fit">
+                        {promo.tipoDescuento}
+                        {promo.tipoDescuento === "$"
+                          ? new Intl.NumberFormat("es-AR").format(promo.valor)
+                          : promo.valor}
+                        {" "}off
+                      </span>
+                      
+                      <span className="text-[#FBDAF9]">
+                        {promo._count.historial} uso{promo._count.historial !== 1 ? 's' : ''}
+                      </span>
+                      
+                      <span className={promo.destacada ? 'text-[#FBDAF9] font-semibold' : 'text-[#FBDAF9]'}>
+                        {promo.destacada ? 'Sí' : 'No'}
+                      </span>
+                    </div>
+
+                    <div className="flex gap-2 justify-end">
+                      <Link
+                        href={`/admin/promociones/${promo.id}`}
+                        className="px-3 py-1 bg-[#271033] text-[#C392DD] rounded-lg text-sm hover:bg-[#C392DD] hover:text-white transition-colors flex items-center font-normal"
+                      >
+                        Editar
+                      </Link>
+                      <DeleteButton id={promo.id} usos={promo._count.historial} />
+                    </div>
                   </div>
 
-                  <span className="text-[#F500F1] font-bold">
-                    {promo.tipoDescuento}{promo.valor} off
-                  </span>
-                  
-                  <span className="text-[#FBDAF9]">
-                    {promo._count.historial} uso{promo._count.historial !== 1 ? 's' : ''}
-                  </span>
-                  
-                  <span className={promo.destacada ? 'text-[#F500F1] font-semibold' : 'text-[#FBDAF9]'}>
-                    {promo.destacada ? 'Sí' : 'No'}
-                  </span>
-
-                  {/* Sugerencias de acción al lado de los botones si caducó */}
-                  <div className="text-right text-[11px] text-[#FBDAF9] opacity-80 font-medium pr-2 max-w-[120px]">
-                    {esCaducada && "Sugerencia: Actualizá la fecha de vigencia o eliminá la promoción."}
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/admin/promociones/${promo.id}`}
-                      className="px-3 py-1 bg-[#271033] text-[#C392DD] rounded-lg text-sm hover:bg-[#C392DD] hover:text-white transition-colors flex items-center"
-                    >
-                      Editar
-                    </Link>
-                    <DeleteButton id={promo.id} usos={promo._count.historial} />
-                  </div>
+                  {esCaducada && (
+                    <div className="mx-auto w-fit p-3 bg-[#1b0422] border border-red-500 rounded-xl flex items-center justify-center gap-2 text-xs text-[#FBDAF9] text-center">
+                      <span className="text-red-500 font-bold">Sugerencia:</span>
+                      Actualizá la fecha de vigencia o eliminá la promoción para mantener el panel organizado.
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -134,63 +141,69 @@ export default async function AdminPromociones({
             {promociones.map((promo) => {
               const inicio = new Date(promo.fechaInicio);
               const fin = promo.fechaFin ? new Date(promo.fechaFin) : null;
-              const esFutura = inicio > ahora;
-              const esCaducada = fin !== null && fin < ahora;
+              const esFuturaCard = inicio > ahora;
+              const esCaducadaCard = fin !== null && fin < ahora;
 
-              let estiloEstado = "bg-[#8D62A5]";
-              if (esFutura) estiloEstado = "bg-[#8D62A5] opacity-80";
-              if (esCaducada) estiloEstado = "bg-[#8D62A5] opacity-60";
+              let colorFondoMobile = "bg-[#8D62A5]";
+              if (esFuturaCard) colorFondoMobile = "bg-[#6b4582]";
+              if (esCaducadaCard) colorFondoMobile = "bg-[#431b54]";
 
               return (
                 <div
                   key={promo.id}
-                  className={`p-5 rounded-2xl border border-[#C392DD] flex flex-col gap-3 ${estiloEstado}`}
+                  className={`p-5 rounded-2xl border border-[#C392DD] flex flex-col gap-3 ${colorFondoMobile}`}
                 >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="text-white font-extrabold text-lg">{promo.nombre}</h3>
-                        {esFutura && (
-                          <span className="px-2 py-0.5 text-[9px] font-bold uppercase rounded bg-[#C392DD] text-white">
-                            Programada
-                          </span>
-                        )}
-                        {esCaducada && (
-                          <span className="px-2 py-0.5 text-[9px] font-bold uppercase rounded bg-[#271033] text-white">
-                            Caducada
-                          </span>
-                        )}
+                  <div>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-white font-extrabold text-lg">{promo.nombre}</h3>
+                          {esFuturaCard && (
+                            <span className="px-2 py-0.5 text-[9px] font-bold uppercase rounded bg-[#C392DD] text-white">
+                              Programada
+                            </span>
+                          )}
+                          {esCaducadaCard && (
+                            <span className="px-2 py-0.5 text-[9px] font-bold uppercase rounded bg-[#271033] text-white">
+                              Caducada
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[#FBDAF9] text-sm mt-1">{promo.descripcion}</p>
                       </div>
-                      <p className="text-[#FBDAF9] text-sm mt-1">{promo.descripcion}</p>
+                      <span className="inline-flex items-center bg-[#271033] text-[#F500F1] font-bold px-3 py-1 rounded-md w-fit whitespace-nowrap">
+                        {promo.tipoDescuento}
+                        {promo.tipoDescuento === "$"
+                          ? new Intl.NumberFormat("es-AR").format(promo.valor)
+                          : promo.valor}
+                        {" "}off
+                      </span>
                     </div>
-                    <span className="text-[#F500F1] font-bold text-sm shrink-0">
-                      {promo.tipoDescuento}{promo.valor} off
-                    </span>
+
+                    {esFuturaCard && (
+                      <p className="text-[#FBDAF9] text-xs font-semibold mt-2">
+                        Activa desde: {inicio.toLocaleDateString()}
+                      </p>
+                    )}
+                    {esCaducadaCard && fin && (
+                      <p className="text-[#C392DD] text-s font-semibold mt-2">
+                        Venció el: {fin.toLocaleDateString()}
+                      </p>
+                    )}
+
+                    <div className="flex gap-4 text-sm mt-2">
+                      <span className="text-[#FBDAF9]">{promo._count.historial} usos</span>
+                      <span className={promo.destacada ? 'text-[#FBDAF9]' : 'text-[#FBDAF9]'}>
+                        {promo.destacada ? 'Destacada' : 'No destacada'}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Fechas en mobile */}
-                  {esFutura && (
-                    <p className="text-[#FBDAF9] text-xs font-semibold">
-                      Activa desde: {inicio.toLocaleDateString()}
-                    </p>
-                  )}
-                  {esCaducada && fin && (
-                    <p className="text-[#C392DD] text-xs font-semibold">
-                      Venció el: {fin.toLocaleDateString()}
-                    </p>
-                  )}
-
-                  <div className="flex gap-4 text-sm">
-                    <span className="text-[#FBDAF9]">{promo._count.historial} usos</span>
-                    <span className={promo.destacada ? 'text-[#F500F1]' : 'text-[#FBDAF9]'}>
-                      {promo.destacada ? 'Destacada' : 'No destacada'}
-                    </span>
-                  </div>
-
-                  {esCaducada && (
-                    <p className="text-[#FBDAF9] opacity-80 text-xs italic bg-[#271033]/30 p-2 rounded-lg text-center">
-                      Sugerencia: actualizá la fecha de vigencia o eliminá la promoción.
-                    </p>
+                  {esCaducadaCard && (
+                    <div className="mx-auto w-fit p-3 bg-[#1b0422] border border-red-500 rounded-xl text-xs text-[#FBDAF9] text-center">
+                      <p className="font-bold text-red-500 mb-0.5">Sugerencia:</p>
+                      Actualizá la fecha de vigencia o eliminá la promoción.
+                    </div>
                   )}
 
                   <div className="flex gap-2 pt-2 border-t border-[#C392DD]">
@@ -212,6 +225,9 @@ export default async function AdminPromociones({
             basePath="/admin/promociones" 
           />
         </section>
+        <footer className="mt-12 text-center text-[#FBDAF9] text-sm">
+          <p>RepairDash - Promociones</p>
+        </footer>
       </main>
     </>
   );
