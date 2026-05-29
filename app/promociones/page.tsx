@@ -43,7 +43,7 @@ export default async function PaginaPromociones({
       <Header />
       <main className="flex min-h-screen flex-col p-4 md:p-8 bg-[#271033] text-white">
         <section>
-          <h2 className="text-3xl font-bold text-[#C392DD] mb-8 text-center">
+          <h2 className="text-3xl font-bold text-[#C392DD] mb-4 text-center">
             Todas las promociones
           </h2>
           <p className="text-center text-[#FBDAF9] mb-12">

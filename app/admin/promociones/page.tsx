@@ -225,6 +225,9 @@ export default async function AdminPromociones({
             basePath="/admin/promociones" 
           />
         </section>
+        <footer className="mt-12 text-center text-[#FBDAF9] text-sm">
+          <p>RepairDash - Promociones</p>
+        </footer>
       </main>
     </>
   );

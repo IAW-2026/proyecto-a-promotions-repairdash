@@ -164,6 +164,9 @@ export default async function HistorialAdmin({
             </>
           )}
         </section>
+        <footer className="mt-12 text-center text-[#FBDAF9] text-sm">
+          <p>RepairDash - Promociones</p>
+        </footer>
       </main>
     </>
   );

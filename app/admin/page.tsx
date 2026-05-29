@@ -121,12 +121,10 @@ export default async function AdminDashboard() {
             <TarjetaMetrica label="Caducadas sin eliminar" valor={caducadas} alerta icono={iconoBasura} />
           </div>
 
-          <footer className="mt-8 text-center">
-            <div className="inline-block p-4 bg-[#1b0422] rounded-2xl border border-[#8D62A5]/30">
-              <p className="text-[#8D62A5] text-xs">RepairDash - Promociones</p>
-            </div>
-          </footer>
         </section>
+        <footer className="mt-12 text-center text-[#FBDAF9] text-sm">
+            <p>RepairDash - Promociones</p>
+        </footer>
       </main>
     </>
   );
