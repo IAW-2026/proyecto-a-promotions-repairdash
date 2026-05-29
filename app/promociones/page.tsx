@@ -5,31 +5,55 @@ import { usuarioCalifica } from '@/lib/filtroUsuarios';
 import Paginacion from '../componentes/Paginacion';
 import RiderAppLink from '../componentes/RiderAppLink';
 import Link from 'next/link';
+import BuscarPromociones from '../componentes/BuscarPromociones';
+import { obtenerTiposServicio } from '@/lib/tiposServicio';
 
 const POR_PAGINA = 9;
+
+function obtenerParametro(valor: string | string[] | undefined) {
+  return Array.isArray(valor) ? valor[0] ?? '' : valor ?? '';
+}
+
+function obtenerParametros(valor: string | string[] | undefined) {
+  if (!valor) return [];
+  return Array.isArray(valor) ? valor.filter(Boolean) : [valor];
+}
 
 export default async function PaginaPromociones({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string; servicio?: string | string[] }>;
 }) {
-  const { page } = await searchParams;
-  const paginaActual = Math.max(1, parseInt(page ?? '1'));
+  const params = await searchParams;
+  const page = obtenerParametro(params.page);
+  const queryNombre = obtenerParametro(params.q).trim();
+  const serviciosSeleccionados = obtenerParametros(params.servicio);
+  const paginaActual = Math.max(1, parseInt(page || '1'));
   const user = await currentUser();
   const ahora = new Date();
+  const tiposServicio = await obtenerTiposServicio();
 
   const todasLasPromos = await prisma.promocion.findMany({
     where: {
       eliminada: false,
       fechaInicio: { lte: ahora },
       OR: [{ fechaFin: null }, { fechaFin: { gte: ahora } }],
+      ...(queryNombre
+        ? { nombre: { contains: queryNombre, mode: 'insensitive' as const } }
+        : {}),
+      ...(serviciosSeleccionados.length > 0
+        ? { categorias: { hasSome: serviciosSeleccionados } }
+        : {}),
     },
   });
 
   const promocionesFiltradas = (
     await Promise.all(
       todasLasPromos.map(async (promo) => {
-        const califica = await usuarioCalifica(user?.id ?? '', promo.filtroUsuarios as any);
+        const califica = await usuarioCalifica(
+          user?.id ?? '',
+          promo.filtroUsuarios as Parameters<typeof usuarioCalifica>[1]
+        );
         return califica ? promo : null;
       })
     )
@@ -51,7 +75,20 @@ export default async function PaginaPromociones({
             Conocé todas las promociones vigentes que aplican para vos, las podes usar la próxima vez que solicites un servicio.
           </p>
           
+          <BuscarPromociones
+            basePath="/promociones"
+            queryNombre={queryNombre}
+            serviciosSeleccionados={serviciosSeleccionados}
+            tiposServicio={tiposServicio}
+          />
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {paginadas.length === 0 && (
+              <p className="md:col-span-2 lg:col-span-3 text-center text-[#FBDAF9]">
+                No encontramos promociones con esos filtros.
+              </p>
+            )}
+
             {paginadas.map((promo) => (
               <div 
                 key={promo.id} 
@@ -80,7 +117,12 @@ export default async function PaginaPromociones({
               </div>
             ))}
           </div>
-          <Paginacion paginaActual={paginaActual} totalPaginas={totalPaginas} basePath="/promociones" />
+          <Paginacion
+            paginaActual={paginaActual}
+            totalPaginas={totalPaginas}
+            basePath="/promociones"
+            searchParams={{ q: queryNombre, servicio: serviciosSeleccionados }}
+          />
         </section>
         <footer className="mt-16 text-center text-[#FBDAF9] text-sm">
           <div className="w-full flex justify-center mb-4">
