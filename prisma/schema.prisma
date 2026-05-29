@@ -38,6 +38,7 @@ model Promocion {
   destacada      Boolean          @default(false)
   precioMinimo   Float?
   categorias     String[]
+  nombreCategorias String[]       @default(null)
   eliminada      Boolean          @default(false)
   fechaInicio    DateTime          @default(now())
   fechaFin       DateTime?

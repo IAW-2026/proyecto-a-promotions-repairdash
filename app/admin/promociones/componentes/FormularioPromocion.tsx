@@ -79,9 +79,17 @@ export default function FormularioPromocion(props: Props) {
   const [hayCambios, setHayCambios] = useState(false);
   const [errores, setErrores] = useState<Errores>({});
 
-  useEffect(() => {
+  const marcarCambios = useCallback(() => {
     if (!loadingData) setHayCambios(true);
-  }, [form, categorias, filtroUsuarios, fechaInicio, tieneCaducidad, fechaFin]);
+  }, [loadingData]);
+
+  const limpiarError = useCallback((campo: keyof Errores) => {
+    setErrores((prev) => {
+      const nuevos = { ...prev };
+      delete nuevos[campo];
+      return nuevos;
+    });
+  }, []);
 
   useEffect(() => {
     if (!esEdicion) return;
@@ -162,23 +170,9 @@ export default function FormularioPromocion(props: Props) {
     });
   }, [form, tieneCaducidad, fechaFin]);
 
-  // Validar categorias en tiempo real
-  useEffect(() => {
-    if (categorias.length > 0) {
-      setErrores((prev) => { const n = { ...prev }; delete n.categorias; return n; });
-    }
-  }, [categorias]);
-
-  // Validar filtro usuarios en tiempo real
-  useEffect(() => {
-    if (!filtroConError) {
-      setErrores((prev) => { const n = { ...prev }; delete n.filtroUsuarios; return n; });
-    }
-  }, [filtroConError]);
-
   const handleVolver = () => {
     if (hayCambios) {
-      const confirmar = window.confirm('Tenés cambios sin guardar. ¿Seguro que querés salir?');
+      const confirmar = window.confirm('¿Seguro que querés salir? Se perderán los cambios que hayas hecho.');
       if (!confirmar) return;
     }
     router.back();
@@ -186,6 +180,7 @@ export default function FormularioPromocion(props: Props) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
+    marcarCambios();
 
     if (name === 'valor' && form.tipoDescuento === '$') {
       const raw = desformatearMonto(value);
@@ -379,7 +374,10 @@ export default function FormularioPromocion(props: Props) {
                 <input
                   type="datetime-local"
                   value={fechaInicio}
-                  onChange={(e) => setFechaInicio(e.target.value)}
+                  onChange={(e) => {
+                    marcarCambios();
+                    setFechaInicio(e.target.value);
+                  }}
                   className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1] w-full [color-scheme:dark]"
                 />
               </div>
@@ -389,6 +387,7 @@ export default function FormularioPromocion(props: Props) {
                   type="checkbox"
                   checked={tieneCaducidad}
                   onChange={(e) => {
+                    marcarCambios();
                     setTieneCaducidad(e.target.checked);
                     if (!e.target.checked) {
                       setFechaFin('');
@@ -406,7 +405,10 @@ export default function FormularioPromocion(props: Props) {
                   <input
                     type="datetime-local"
                     value={fechaFin}
-                    onChange={(e) => setFechaFin(e.target.value)}
+                    onChange={(e) => {
+                      marcarCambios();
+                      setFechaFin(e.target.value);
+                    }}
                     onBlur={() => validarCampo('fechaFin')}
                     min={fechaInicio}
                     className={`bg-[#271033] border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1] w-full [color-scheme:dark] ${errores.fechaFin ? 'border-red-500' : 'border-[#8D62A5]'}`}
@@ -418,7 +420,18 @@ export default function FormularioPromocion(props: Props) {
 
             {/* Tipos de servicio */}
             <div className="pt-2 border-t border-[#8D62A5]">
-              <TiposServicioSelector value={categorias} onChange={setCategorias} />
+              <TiposServicioSelector
+                value={categorias}
+                onAutoChange={(tipos) => {
+                  setCategorias(tipos);
+                  if (tipos.length > 0) limpiarError('categorias');
+                }}
+                onChange={(tipos) => {
+                  marcarCambios();
+                  setCategorias(tipos);
+                  if (tipos.length > 0) limpiarError('categorias');
+                }}
+              />
               {errores.categorias && <p className="text-red-400 text-xs mt-2">{errores.categorias}</p>}
             </div>
 
@@ -445,8 +458,14 @@ export default function FormularioPromocion(props: Props) {
             <div className="pt-2 border-t border-[#8D62A5]">
               <FiltroUsuariosSelector
                 value={filtroUsuarios}
-                onChange={setFiltroUsuarios}
-                onError={setFiltroConError}
+                onChange={(filtro) => {
+                  marcarCambios();
+                  setFiltroUsuarios(filtro);
+                }}
+                onError={(hayError) => {
+                  setFiltroConError(hayError);
+                  if (!hayError) limpiarError('filtroUsuarios');
+                }}
               />
               {errores.filtroUsuarios && <p className="text-red-400 text-xs mt-2">{errores.filtroUsuarios}</p>}
             </div>
