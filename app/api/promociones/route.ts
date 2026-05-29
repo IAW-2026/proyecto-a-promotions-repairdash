@@ -2,12 +2,6 @@ import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { usuarioCalifica } from '@/lib/filtroUsuarios';
 
-type TipoServicio = {
-  id: string;
-  nombre: string;
-  descripcion: string;
-};
-
 export async function GET(req: Request) {
   const apiKey = req.headers.get('x-api-key');
   if (apiKey !== process.env.RIDER_API_KEY) {
@@ -21,53 +15,59 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Falta usuarioId' }, { status: 400 });
   }
 
-  const tiposRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/tipos-servicio`, {
-    headers: { 'x-api-key': process.env.RIDER_API_KEY! },
-  });
-  const tipos: TipoServicio[] = tiposRes.ok ? await tiposRes.json() : [];
+  try {
+    const ahora = new Date();
+    const todasLasPromos = await prisma.promocion.findMany({
+      where: {
+        eliminada: false,
+        fechaInicio: { lte: ahora },
+        OR: [
+          { fechaFin: null },
+          { fechaFin: { gte: ahora } },
+        ],
+      },
+      select: {
+        id: true,
+        nombre: true,
+        tipoDescuento: true,
+        valor: true,
+        precioMinimo: true,
+        categorias: true,
+        filtroUsuarios: true,
+        usoUnico: true,
+      },
+    });
 
-  const ahora = new Date();
-  const todasLasPromos = await prisma.promocion.findMany({
-    where: {
-      eliminada: false,
-      fechaInicio: { lte: ahora },
-      OR: [
-        { fechaFin: null },
-        { fechaFin: { gte: ahora } },
-      ],
-    },
-    select: {
-      id: true,
-      nombre: true,
-      tipoDescuento: true,
-      valor: true,
-      precioMinimo: true,
-      categorias: true,
-      filtroUsuarios: true,
-      usoUnico: true,
-    },
-  });
+    const promocionesFiltradas = await Promise.all(
+      todasLasPromos.map(async (promo) => {
+        const califica = await usuarioCalifica(usuarioId, promo.filtroUsuarios as any);
+        if (!califica) return null;
 
-  const promociones = await Promise.all(
-    todasLasPromos.map(async (promo) => {
-      const califica = await usuarioCalifica(usuarioId, promo.filtroUsuarios as any);
-      if (!califica) return null;
-      if (promo.usoUnico) {
-        const yaUsada = await prisma.historialDeUso.findFirst({
-          where: { promocionId: promo.id, usuarioId },
-        });
-        if (yaUsada) return null;
-      }
-      return {
-        ...promo,
-        categorias: promo.categorias.map(
-          (id) => tipos.find((t) => t.id === id)?.nombre ?? id
-        ),
-        filtroUsuarios: undefined,
-        usoUnico: undefined,
-      };
-    })
-  );
+        if (promo.usoUnico) {
+          const yaUsada = await prisma.historialDeUso.findFirst({
+            where: { promocionId: promo.id, usuarioId },
+          });
+          if (yaUsada) return null;
+        }
 
-  return NextResponse.json(promociones.filter(Boolean));
+        return {
+          id: promo.id,
+          nombre: promo.nombre,
+          tipoDescuento: promo.tipoDescuento,
+          valor: promo.valor,
+          precioMinimo: promo.precioMinimo,
+          categorias: promo.categorias, 
+        };
+      })
+    );
+
+    return NextResponse.json({
+      status: 'success',
+      data: promocionesFiltradas.filter(Boolean)
+    });
+
+  } catch (error) {
+    console.error('Error interno del servidor:', error);
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
+  }
 }
