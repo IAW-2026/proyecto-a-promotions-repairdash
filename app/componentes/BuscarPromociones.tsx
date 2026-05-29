@@ -143,8 +143,9 @@ export default function BuscarPromociones({
 
   return (
     <section className="mb-8 rounded-2xl border border-[#C392DD]/30 bg-gradient-to-b from-[#1b0422] to-[#120217] p-5 shadow-[0_15px_35px_rgba(0,0,0,0.3)] backdrop-blur-md">
-      {/* Contenedor Flex: se apila en vertical en móviles y se alinea horizontalmente en pantallas grandes */}
       <div className="flex flex-col lg:flex-row gap-4 w-full lg:items-end">
+        
+        {/* INPUT DE BÚSQUEDA */}
         <div className="flex flex-col gap-1.5 flex-1 lg:flex-[1.5] w-full">
           <label className="text-[11px] font-bold uppercase tracking-wider text-[#C392DD]/80 flex items-center gap-2">
             Buscar Promoción
@@ -166,9 +167,11 @@ export default function BuscarPromociones({
           </div>
         </div>
 
+        {/* CONTENEDOR DESPLEGABLE (ADMIN / USUARIO) */}
         <div className="flex flex-col gap-1.5 flex-1 lg:flex-[2] w-full">
           {esAdmin ? (
             <>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#C392DD]/80">Parámetros</label>
               <details ref={detailsRef} className="group relative w-full">
                 <summary className="flex h-11 cursor-pointer list-none items-center justify-between rounded-xl border border-[#8D62A5]/40 bg-[#271033]/60 px-4 text-sm font-medium text-[#FBDAF9] transition-all hover:border-[#C392DD]/60 hover:bg-[#271033]">
                   <div className="flex items-center gap-2">
@@ -183,6 +186,8 @@ export default function BuscarPromociones({
                 </summary>
                 
                 <div className="absolute left-0 z-30 mt-2 max-h-[80vh] w-full min-w-[300px] sm:min-w-[520px] overflow-hidden rounded-xl border border-[#C392DD]/40 bg-[#1f0929] shadow-[0_20px_40px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-top-2 duration-150">
+                  
+                  {/* CRUZ DE CIERRE */}
                   <button
                     type="button"
                     onClick={() => detailsRef.current?.removeAttribute('open')}
@@ -193,8 +198,15 @@ export default function BuscarPromociones({
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 p-5 pt-9 sm:pt-5">
+
+                  {/* AJUSTE: pt-11 en móviles y pt-6 en sm para balancear con el botón de cierre */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 p-5 pt-11 sm:pt-6">
+                    
+                    {/* SECCIÓN TIPOS DE SERVICIO (AGREGADO EL TÍTULO COHERENTE) */}
                     <div className="space-y-2">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#F500F1] border-b border-[#C392DD]/10 pb-1.5">
+                        Tipos de Servicio
+                      </p>
                       <div className="flex flex-col gap-1 max-h-48 overflow-y-auto custom-scrollbar">
                         {tiposServicio.map((tipo) => (
                           <label key={tipo.id} className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 text-xs text-[#FBDAF9] transition-colors hover:bg-[#271033]">
@@ -210,6 +222,7 @@ export default function BuscarPromociones({
                       </div>
                     </div>
 
+                    {/* BLOQUES DINÁMICOS EXTRAS (ESTADO, USUARIOS, ETC.) */}
                     {filtrosExtra.map((filtro) => (
                       <div key={filtro.nombre} className="space-y-2">
                         <p className="text-[10px] font-bold uppercase tracking-widest text-[#F500F1] border-b border-[#C392DD]/10 pb-1.5">{filtro.label}</p>
@@ -244,6 +257,7 @@ export default function BuscarPromociones({
             </>
           ) : (
             <>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#C392DD]/80">Servicios</label>
               <details ref={detailsRef} className="group relative w-full">
                 <summary className="flex h-11 cursor-pointer list-none items-center justify-between rounded-xl border border-[#8D62A5]/40 bg-[#271033]/60 px-4 text-sm font-medium text-[#FBDAF9] transition-all hover:border-[#C392DD]/60 hover:bg-[#271033]">
                   <div className="flex flex-row items-center gap-1.5 max-w-[85%] overflow-hidden">
@@ -270,7 +284,7 @@ export default function BuscarPromociones({
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
-                  <div className="p-3">
+                  <div className="p-3 pt-11">
                     <div className="flex flex-col gap-0.5 max-h-52 overflow-y-auto pr-1 custom-scrollbar">
                       {tiposServicio.map((tipo) => (
                         <label key={tipo.id} className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[#FBDAF9] transition-colors hover:bg-[#271033]">
@@ -301,8 +315,6 @@ export default function BuscarPromociones({
           )}
         </div>
 
-        {/* BOTÓN LIMPIAR (CONDICIONALMENTE SE RENDERIZA U OCUPA SU ESPACIO) */}
-        {/* Al remover por completo el bloque del 'else', si no hay filtros, Flexbox reparte el resto del ancho al buscador y desplegables */}
         {tieneFiltrosEnUrl && (
           <div className="w-full lg:w-auto shrink-0 animate-in fade-in duration-150">
             <Link
