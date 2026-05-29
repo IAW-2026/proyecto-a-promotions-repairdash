@@ -19,7 +19,7 @@ export async function GET() {
   ];
 
   // Cuando se conecten las apps, reemplazo el mock con esto:
-  // const res = await fetch(`${process.env.DRIVER_APP_URL}/api/tipos-servicio`, {
+  // const res = await fetch(`${process.env.NEXT_PUBLIC_DRIVER_APP_URL}/api/tipos-servicio`, {
   //   headers: { 'x-api-key': process.env.DRIVER_API_KEY! },
   // });
   // const json = await res.json();

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { currentUser } from '@clerk/nextjs/server';
 import { usuarioCalifica } from '@/lib/filtroUsuarios';
 import Paginacion from '../componentes/Paginacion';
+import RiderAppLink from '../componentes/RiderAppLink';
 
 const POR_PAGINA = 9;
 
@@ -65,6 +66,12 @@ export default async function PaginaPromociones({
           </div>
           <Paginacion paginaActual={paginaActual} totalPaginas={totalPaginas} basePath="/promociones" />
         </section>
+        <footer className="mt-16 text-center text-[#FBDAF9] text-sm">
+            <div className="w-full flex justify-center mb-4">
+              <RiderAppLink />
+            </div>
+            <p>RepairDash - Promociones</p>
+          </footer>
       </main>
     </>
   );

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { currentUser } from '@clerk/nextjs/server';
 import Paginacion from '../componentes/Paginacion';
+import RiderAppLink from '../componentes/RiderAppLink';
 
 const POR_PAGINA = 6;
 
@@ -97,7 +98,7 @@ export default async function PaginaHistorial({
                     <span className="text-[#FBDAF9] text-sm">{item.fechaUso}</span>
                     <span className="text-[#FBDAF9] line-through">${item.valorOriginal}</span>
                     <span className="text-white font-bold">${item.valorPagado}</span>
-                    <span className="text-[#F500F1] font-bold">${item.valorOriginal - item.valorPagado}</span>
+                    <span className="text-white font-bold">${item.valorOriginal - item.valorPagado}</span>
                   </div>
                 ))}
               </div>
@@ -123,7 +124,7 @@ export default async function PaginaHistorial({
                       </div>
                       <div>
                         <p className="text-[#FBDAF9] text-xs mb-1">Ahorraste</p>
-                        <p className="text-[#F500F1] font-bold text-lg">${item.valorOriginal - item.valorPagado}</p>
+                        <p className="text-white font-bold text-lg">${item.valorOriginal - item.valorPagado}</p>
                       </div>
                     </div>
                   </div>
@@ -134,7 +135,10 @@ export default async function PaginaHistorial({
             </>
           )}
         </section>
-        <footer className="mt-16 text-center text-[#FBDAF9] text-sm">
+        <footer className="mt-12 text-center text-[#FBDAF9] text-sm">
+          <div className="w-full flex justify-center mb-4">
+            <RiderAppLink />
+          </div>
           <p>RepairDash - Promociones</p>
         </footer>
       </main>
