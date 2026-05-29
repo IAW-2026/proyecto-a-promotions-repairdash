@@ -183,7 +183,17 @@ export default function BuscarPromociones({
                 </summary>
                 
                 <div className="absolute left-0 z-30 mt-2 max-h-[80vh] w-full min-w-[300px] sm:min-w-[520px] overflow-hidden rounded-xl border border-[#C392DD]/40 bg-[#1f0929] shadow-[0_20px_40px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-top-2 duration-150">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 p-5">
+                  <button
+                    type="button"
+                    onClick={() => detailsRef.current?.removeAttribute('open')}
+                    className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-lg border border-[#8D62A5]/30 bg-[#271033]/40 text-[#C392DD] hover:border-[#F500F1] hover:text-white hover:bg-[#F500F1]/20 transition-all z-40 group/btn"
+                    title="Cerrar sin aplicar"
+                  >
+                    <svg className="h-4 w-4 transition-transform group-hover/btn:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 p-5 pt-9 sm:pt-5">
                     <div className="space-y-2">
                       <div className="flex flex-col gap-1 max-h-48 overflow-y-auto custom-scrollbar">
                         {tiposServicio.map((tipo) => (
@@ -250,6 +260,16 @@ export default function BuscarPromociones({
                 </summary>
                 
                 <div className="absolute z-30 mt-2 w-full min-w-[250px] overflow-hidden rounded-xl border border-[#C392DD]/40 bg-[#1f0929] shadow-[0_20px_40px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-top-2 duration-150">
+                  <button
+                    type="button"
+                    onClick={() => detailsRef.current?.removeAttribute('open')}
+                    className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-lg border border-[#8D62A5]/30 bg-[#271033]/40 text-[#C392DD] hover:border-[#F500F1] hover:text-white hover:bg-[#F500F1]/20 transition-all z-40 group/btn"
+                    title="Cerrar sin aplicar"
+                  >
+                    <svg className="h-4 w-4 transition-transform group-hover/btn:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                   <div className="p-3">
                     <div className="flex flex-col gap-0.5 max-h-52 overflow-y-auto pr-1 custom-scrollbar">
                       {tiposServicio.map((tipo) => (
