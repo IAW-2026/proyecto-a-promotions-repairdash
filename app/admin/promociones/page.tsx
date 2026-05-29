@@ -115,6 +115,7 @@ export default async function AdminPromociones({
                     </div>
 
                     <div className="flex gap-2 justify-end">
+                      {/* Cambiado para asegurar que coincida con tu carpeta exacta */}
                       <Link
                         href={`/admin/promociones/${promo.id}/detalle`}
                         className="px-3 py-1 bg-[#271033] text-[#C392DD] rounded-lg text-sm hover:bg-[#C392DD] hover:text-white transition-colors flex items-center font-normal"
@@ -213,7 +214,14 @@ export default async function AdminPromociones({
 
                   <div className="flex gap-2 pt-2 border-t border-[#C392DD]">
                     <Link
-                      href={`/admin/promociones/${promo.id}`}
+                      href={`/admin/promociones/${promo.id}/detalle`}
+                      className="flex-1 text-center px-3 py-2 bg-[#271033] text-[#C392DD] rounded-lg text-sm hover:bg-[#C392DD] hover:text-white transition-colors"
+                    >
+                      Ver detalle
+                    </Link>
+                    
+                    <Link
+                      href={`/admin/promociones/${promo.id}/edicion`}
                       className="flex-1 text-center px-3 py-2 bg-[#271033] text-[#C392DD] rounded-lg text-sm hover:bg-[#C392DD] hover:text-white transition-colors"
                     >
                       Editar
