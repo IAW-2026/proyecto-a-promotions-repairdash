@@ -52,7 +52,7 @@ export default async function PaginaHistorial({
   return (
     <>
       <Header />
-      <main className="flex min-h-screen flex-col p-4 md:p-8 bg-[#271033] text-white">
+      <main className="p-4 md:p-8 bg-[#271033] text-white">
         <section>
           <h2 className="text-3xl font-bold text-[#C392DD] mb-2 text-center">
             Historial de Promociones Usadas

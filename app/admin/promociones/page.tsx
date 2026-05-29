@@ -116,7 +116,13 @@ export default async function AdminPromociones({
 
                     <div className="flex gap-2 justify-end">
                       <Link
-                        href={`/admin/promociones/${promo.id}`}
+                        href={`/admin/promociones/${promo.id}/detalle`}
+                        className="px-3 py-1 bg-[#271033] text-[#C392DD] rounded-lg text-sm hover:bg-[#C392DD] hover:text-white transition-colors flex items-center font-normal"
+                      >
+                        Ver
+                      </Link>
+                      <Link
+                        href={`/admin/promociones/${promo.id}/edicion`}
                         className="px-3 py-1 bg-[#271033] text-[#C392DD] rounded-lg text-sm hover:bg-[#C392DD] hover:text-white transition-colors flex items-center font-normal"
                       >
                         Editar
@@ -124,7 +130,6 @@ export default async function AdminPromociones({
                       <DeleteButton id={promo.id} usos={promo._count.historial} />
                     </div>
                   </div>
-
                   {esCaducada && (
                     <div className="mx-auto w-fit p-3 bg-[#1b0422] border border-red-500 rounded-xl flex items-center justify-center gap-2 text-xs text-[#FBDAF9] text-center">
                       <span className="text-red-500 font-bold">Sugerencia:</span>
