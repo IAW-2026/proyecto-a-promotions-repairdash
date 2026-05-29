@@ -15,7 +15,12 @@ export default function RiderAppLink() {
 
   return (
     <div className="w-full flex justify-center">
-      <p className="text-xl text-white flex items-center gap-2">
+      <p
+        className="
+          flex items-center gap-2 text-white text-sm
+          sm:text-xl
+        "
+      >
         Hacé uso de las promociones en
         <button
           onClick={handleClick}
@@ -23,13 +28,15 @@ export default function RiderAppLink() {
             inline-flex items-center
             bg-[#F500F1]
             text-[#271033]
-            font-extrabold
-            px-3 py-1
+            font-bold sm:font-extrabold
+            px-2 py-0.5
+            sm:px-3 sm:py-1
             rounded-md
             hover:bg-[#F500F1]/80
             transition-colors
             cursor-pointer
             whitespace-nowrap
+            text-s sm:text-base
           "
         >
           RiderApp
