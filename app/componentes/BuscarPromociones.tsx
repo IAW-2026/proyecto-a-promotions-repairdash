@@ -44,6 +44,7 @@ export default function BuscarPromociones({
   const router = useRouter();
   const searchParams = useSearchParams();
   const detailsRef = useRef<HTMLDetailsElement>(null);
+  const isLocalChange = useRef(false);
 
   const [isPending, startTransition] = useTransition();
   const [query, setQuery] = useState(queryNombre);
@@ -61,6 +62,10 @@ export default function BuscarPromociones({
   const stringExtrasUrl = JSON.stringify(filtrosExtra.map(f => `${f.nombre}:${f.seleccionados.join('-')}`));
 
   useEffect(() => {
+    if (isLocalChange.current) {
+      isLocalChange.current = false;
+      return;
+    }
     setQuery(queryNombre);
     setServiciosPendientes(serviciosSeleccionados);
     
@@ -112,8 +117,13 @@ export default function BuscarPromociones({
     });
   };
 
+  const searchParamsRef = useRef(searchParams);
+  useEffect(() => {
+    searchParamsRef.current = searchParams;
+  }, [searchParams]);
   useEffect(() => {
     const timeout = setTimeout(() => {
+      const params = searchParamsRef.current;
       const urlQuery = searchParams.get('q') ?? '';
       if (urlQuery !== query.trim()) {
         const params = new URLSearchParams(searchParams.toString());
@@ -125,7 +135,7 @@ export default function BuscarPromociones({
         }
 
         const nuevaUrl = params.toString() ? `${basePath}?${params.toString()}` : basePath;
-
+        isLocalChange.current = true;
         startTransition(() => {
           router.replace(nuevaUrl, { scroll: false });
         });
@@ -133,7 +143,7 @@ export default function BuscarPromociones({
     }, 400);
 
     return () => clearTimeout(timeout);
-  }, [query, searchParams, basePath, router]);
+  }, [query, basePath, router]);
 
   const tieneFiltrosEnUrl = Boolean(
     queryNombre ||
@@ -145,7 +155,6 @@ export default function BuscarPromociones({
     <section className="mb-8 rounded-2xl border border-[#C392DD]/30 bg-gradient-to-b from-[#1b0422] to-[#120217] p-5 shadow-[0_15px_35px_rgba(0,0,0,0.3)] backdrop-blur-md">
       <div className="flex flex-col lg:flex-row gap-4 w-full lg:items-end">
         
-        {/* INPUT DE BÚSQUEDA */}
         <div className="flex flex-col gap-1.5 flex-1 lg:flex-[1.5] w-full">
           <label className="text-[11px] font-bold uppercase tracking-wider text-[#C392DD]/80 flex items-center gap-2">
             Buscar Promoción
@@ -167,7 +176,6 @@ export default function BuscarPromociones({
           </div>
         </div>
 
-        {/* CONTENEDOR DESPLEGABLE (ADMIN / USUARIO) */}
         <div className="flex flex-col gap-1.5 flex-1 lg:flex-[2] w-full">
           {esAdmin ? (
             <>
@@ -187,7 +195,6 @@ export default function BuscarPromociones({
                 
                 <div className="absolute left-0 z-30 mt-2 max-h-[80vh] w-full min-w-[300px] sm:min-w-[520px] overflow-hidden rounded-xl border border-[#C392DD]/40 bg-[#1f0929] shadow-[0_20px_40px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-top-2 duration-150">
                   
-                  {/* CRUZ DE CIERRE */}
                   <button
                     type="button"
                     onClick={() => detailsRef.current?.removeAttribute('open')}
@@ -199,10 +206,8 @@ export default function BuscarPromociones({
                     </svg>
                   </button>
 
-                  {/* AJUSTE: pt-11 en móviles y pt-6 en sm para balancear con el botón de cierre */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 p-5 pt-11 sm:pt-6">
                     
-                    {/* SECCIÓN TIPOS DE SERVICIO (AGREGADO EL TÍTULO COHERENTE) */}
                     <div className="space-y-2">
                       <p className="text-[10px] font-bold uppercase tracking-widest text-[#F500F1] border-b border-[#C392DD]/10 pb-1.5">
                         Tipos de Servicio
@@ -222,7 +227,6 @@ export default function BuscarPromociones({
                       </div>
                     </div>
 
-                    {/* BLOQUES DINÁMICOS EXTRAS (ESTADO, USUARIOS, ETC.) */}
                     {filtrosExtra.map((filtro) => (
                       <div key={filtro.nombre} className="space-y-2">
                         <p className="text-[10px] font-bold uppercase tracking-widest text-[#F500F1] border-b border-[#C392DD]/10 pb-1.5">{filtro.label}</p>
