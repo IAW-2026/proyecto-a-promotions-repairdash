@@ -1,6 +1,6 @@
 "use client";
 
-const RIDER_APP_URL = process.env.NEXT_PUBLIC_RIDER_APP_URL!;
+const RIDER_APP_URL = process.env.RIDER_APP_URL!;
 
 export default function RiderAppLink() {
   const handleClick = () => {

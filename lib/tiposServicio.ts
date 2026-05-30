@@ -6,7 +6,7 @@ export type TipoServicio = {
 };
 
 export async function obtenerTiposServicio(): Promise<TipoServicio[]> {
-  const url = process.env.NEXT_PUBLIC_DRIVER_APP_URL || process.env.DRIVER_APP_URL;
+  const url = process.env.DRIVER_APP_URL || process.env.DRIVER_APP_URL;
   const apiKey = process.env.DRIVER_API_KEY;
 
   if (!url || !apiKey) {
