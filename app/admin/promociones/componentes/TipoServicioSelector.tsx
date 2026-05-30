@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type TipoServicio = {
   id: string;
@@ -10,11 +10,20 @@ type TipoServicio = {
 type Props = {
   value: string[];
   onChange: (tipos: string[]) => void;
+  onAutoChange?: (tipos: string[]) => void;
 };
 
-export default function TiposServicioSelector({ value, onChange }: Props) {
+export default function TiposServicioSelector({ value, onChange, onAutoChange }: Props) {
   const [tipos, setTipos] = useState<TipoServicio[]>([]);
   const [loading, setLoading] = useState(true);
+  const debeSeleccionarInicial = useRef(value.length === 0);
+  const onChangeRef = useRef(onChange);
+  const onAutoChangeRef = useRef(onAutoChange);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+    onAutoChangeRef.current = onAutoChange;
+  }, [onChange, onAutoChange]);
 
   useEffect(() => {
     fetch('/api/admin/tipos-servicio')
@@ -24,8 +33,13 @@ export default function TiposServicioSelector({ value, onChange }: Props) {
       })
       .then((data) => {
         setTipos(data);
-        if (value.length === 0) {
-          onChange(data.map((t: TipoServicio) => t.id));
+        if (debeSeleccionarInicial.current) {
+          const tiposIniciales = data.map((t: TipoServicio) => t.id);
+          if (onAutoChangeRef.current) {
+            onAutoChangeRef.current(tiposIniciales);
+          } else {
+            onChangeRef.current(tiposIniciales);
+          }
         }
         setLoading(false);
       })

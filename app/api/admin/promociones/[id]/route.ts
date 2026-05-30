@@ -1,17 +1,41 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
-type Props = {
+type RouteParams = {
   params: Promise<{ id: string }>;
 };
 
-export async function GET(_req: Request, { params }: Props) {
+export async function GET(_req: Request, { params }: RouteParams) {
   const { id } = await params;
   const promo = await prisma.promocion.findUnique({ where: { id: parseInt(id) } });
   return NextResponse.json(promo);
 }
 
-export async function PATCH(req: Request, { params }: Props) {
+export async function DELETE(
+  _request: Request,
+  { params }: RouteParams 
+) {
+  try {
+    const { id } = await params;
+    const idPromocion = parseInt(id);
+
+    if (isNaN(idPromocion)) {
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
+    }
+
+    await prisma.promocion.update({
+      where: { id: idPromocion },
+      data: { eliminada: true },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error al eliminar la promo:", error);
+    return NextResponse.json({ error: 'Error interno' }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: Request, { params }: RouteParams) {
   try {
     const { id } = await params;
     const body = await req.json();
