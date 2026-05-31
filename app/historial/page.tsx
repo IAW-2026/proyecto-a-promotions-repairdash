@@ -56,7 +56,7 @@ export default async function PaginaHistorial({
       <main className="min-h-[calc(100vh-76px)] flex flex-col justify-between p-4 md:p-8 bg-[#271033] text-white">
         <section>
           <BotonVolver href="/" />
-          <h2 className="text-3xl font-bold text-[#C392DD] mb-2 text-center">
+          <h2 className="text-3xl font-bold text-[#F500F1] mb-2 text-center">
             Historial de Promociones Usadas
           </h2>
           <p className="text-[#FBDAF9] text-center mb-8">

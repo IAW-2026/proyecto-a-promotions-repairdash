@@ -76,6 +76,51 @@ export default function BuscarPromociones({
     setExtrasPendientes(inicial);
   }, [queryNombre, stringServiciosUrl, stringExtrasUrl]);
 
+  // Cierra los filtros automáticamente al hacer click o tap fuera del panel abierto
+  useEffect(() => {
+    const escucharClickAfuera = (evento: MouseEvent) => {
+      if (
+        detailsRef.current &&
+        detailsRef.current.hasAttribute('open') &&
+        !detailsRef.current.contains(evento.target as Node)
+      ) {
+        detailsRef.current.removeAttribute('open');
+      }
+    };
+
+    document.addEventListener('click', escucharClickAfuera);
+    return () => {
+      document.removeEventListener('click', escucharClickAfuera);
+    };
+  }, []);
+
+  const ejecutarBusquedaTexto = (valorTexto: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('page');
+
+    if (!valorTexto.trim()) {
+      params.delete('q');
+    } else {
+      params.set('q', valorTexto.trim());
+    }
+
+    const nuevaUrl = params.toString() ? `${basePath}?${params.toString()}` : basePath;
+    isLocalChange.current = true;
+    
+    startTransition(() => {
+      router.replace(nuevaUrl, { scroll: false });
+    });
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    ejecutarBusquedaTexto(query);
+  };
+
   const aplicarFiltrosManuales = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('page');
@@ -121,29 +166,17 @@ export default function BuscarPromociones({
   useEffect(() => {
     searchParamsRef.current = searchParams;
   }, [searchParams]);
+
   useEffect(() => {
     const timeout = setTimeout(() => {
-      const params = searchParamsRef.current;
-      const urlQuery = searchParams.get('q') ?? '';
+      const urlQuery = searchParamsRef.current.get('q') ?? '';
       if (urlQuery !== query.trim()) {
-        const params = new URLSearchParams(searchParams.toString());
-        params.delete('page');
-        if (!query.trim()) {
-          params.delete('q');
-        } else {
-          params.set('q', query.trim());
-        }
-
-        const nuevaUrl = params.toString() ? `${basePath}?${params.toString()}` : basePath;
-        isLocalChange.current = true;
-        startTransition(() => {
-          router.replace(nuevaUrl, { scroll: false });
-        });
+        ejecutarBusquedaTexto(query);
       }
     }, 400);
 
     return () => clearTimeout(timeout);
-  }, [query, basePath, router]);
+  }, [query, basePath]);
 
   const tieneFiltrosEnUrl = Boolean(
     queryNombre ||
@@ -152,7 +185,7 @@ export default function BuscarPromociones({
   );
 
   return (
-    <section className="mb-8 rounded-2xl border border-[#C392DD]/30 bg-gradient-to-b from-[#1b0422] to-[#120217] p-5 shadow-[0_15px_35px_rgba(0,0,0,0.3)] backdrop-blur-md">
+    <form onSubmit={handleFormSubmit} className="mb-8 rounded-2xl border border-[#C392DD]/30 bg-gradient-to-b from-[#1b0422] to-[#120217] p-5 shadow-[0_15px_35px_rgba(0,0,0,0.3)] backdrop-blur-md">
       <div className="flex flex-col lg:flex-row gap-4 w-full lg:items-end">
         
         <div className="flex flex-col gap-1.5 flex-1 lg:flex-[1.5] w-full">
@@ -162,17 +195,30 @@ export default function BuscarPromociones({
               <span className="inline-flex h-2 w-2 animate-ping rounded-full bg-[#F500F1]" />
             )}
           </label>
-          <div className="relative flex items-center">
+          <div className="relative flex items-center w-full">
             <svg className="absolute left-3.5 h-4 w-4 text-[#8D62A5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
-              type="search"
+              type="text"
+              enterKeyHint="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Escribí para buscar..."
-              className="h-11 w-full rounded-xl border border-[#8D62A5]/40 bg-[#271033]/60 pl-10 pr-4 text-sm text-white outline-none transition-all placeholder:text-[#8D62A5]/70 focus:border-[#F500F1] focus:bg-[#271033] focus:shadow-[0_0_15px_rgba(245,0,241,0.15)]"
+              className="h-11 w-full rounded-xl border border-[#8D62A5]/40 bg-[#271033]/60 pl-10 pr-12 text-sm text-white outline-none transition-all placeholder:text-[#8D62A5]/70 focus:border-[#F500F1] focus:bg-[#271033] focus:shadow-[0_0_15px_rgba(245,0,241,0.15)]"
             />
+            
+            {query.trim().length > 0 && (
+              <button
+                type="submit"
+                className="absolute right-2 flex h-7 w-8 items-center justify-center rounded-lg bg-[#F500F1] text-white hover:bg-[#c400c0] transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-150"
+                title="Buscar ahora"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
 
@@ -207,7 +253,6 @@ export default function BuscarPromociones({
                   </button>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 p-5 pt-11 sm:pt-6">
-                    
                     <div className="space-y-2">
                       <p className="text-[10px] font-bold uppercase tracking-widest text-[#F500F1] border-b border-[#C392DD]/10 pb-1.5">
                         Tipos de Servicio
@@ -331,6 +376,6 @@ export default function BuscarPromociones({
         )}
 
       </div>
-    </section>
+    </form>
   );
 }

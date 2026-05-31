@@ -6,6 +6,7 @@ import Paginacion from '../../componentes/Paginacion';
 import BuscarPromociones from '../../componentes/BuscarPromociones';
 import { obtenerTiposServicio } from '@/lib/tiposServicio';
 import BotonVolver from '@/app/componentes/BotonVolver';
+import { redirect } from 'next/navigation';
 
 const POR_PAGINA = 6;
 
@@ -96,6 +97,17 @@ export default async function AdminPromociones({
     coincideFiltroUsuarios(promo.filtroUsuarios, usuariosSeleccionados)
   );
   const totalPaginas = Math.ceil(promocionesFiltradas.length / POR_PAGINA);
+
+  if (paginaActual > totalPaginas && totalPaginas > 0) {
+    const queryParams = new URLSearchParams();
+    if (queryNombre) queryParams.set('q', queryNombre);
+    serviciosSeleccionados.forEach(s => queryParams.append('servicio', s));
+    estadosSeleccionados.forEach(e => queryParams.append('estado', e));
+    usuariosSeleccionados.forEach(u => queryParams.append('usuarios', u));
+    queryParams.set('page', String(totalPaginas));
+    redirect(`/admin/promociones?${queryParams.toString()}`);
+  }
+
   const promociones = promocionesFiltradas.slice(
     (paginaActual - 1) * POR_PAGINA,
     paginaActual * POR_PAGINA
