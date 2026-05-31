@@ -94,7 +94,7 @@ export default async function HistorialAdmin({
             </div>
             <div className="p-6 bg-[#1b0422] rounded-2xl border border-[#C392DD] text-center flex flex-col justify-center">
               <p className="text-[#FBDAF9] text-sm font-medium uppercase tracking-wider mb-2">Ahorro Global</p>
-              <p className="text-4xl font-extrabold text-[#F500F1]">${totalAhorro}</p>
+              <p className="text-4xl font-extrabold text-[#F500F1]">${totalAhorro.toLocaleString('es-AR')}</p>
             </div>
           </div>
 
@@ -119,9 +119,9 @@ export default async function HistorialAdmin({
                     <span className="text-white font-extrabold">{item.nombre}</span>
                     <span className="text-[#C392DD] font-semibold">#{item.trabajoId}</span>
                     <span className="text-[#FBDAF9] text-sm">{item.fechaUso}</span>
-                    <span className="text-[#FBDAF9] line-through">${item.valorOriginal}</span>
-                    <span className="text-white font-bold">${item.valorPagado}</span>
-                    <span className="text-white font-extrabold">${item.valorOriginal - item.valorPagado}</span>
+                    <span className="text-[#FBDAF9] line-through">${item.valorOriginal.toLocaleString('es-AR')}</span>
+                    <span className="text-white font-bold">${item.valorPagado.toLocaleString('es-AR')}</span>
+                    <span className="text-white font-extrabold">${(item.valorOriginal - item.valorPagado).toLocaleString('es-AR')}</span>
                   </div>
                 ))}
               </div>
@@ -142,15 +142,15 @@ export default async function HistorialAdmin({
                     <div className="flex justify-between pt-3 border-t border-[#C392DD]">
                       <div>
                         <p className="text-[#FBDAF9] text-[10px]">Original</p>
-                        <p className="text-[#FBDAF9] line-through text-xs">${item.valorOriginal}</p>
+                        <p className="text-[#FBDAF9] line-through text-xs">${item.valorOriginal.toLocaleString('es-AR')}</p>
                       </div>
                       <div>
                         <p className="text-[#FBDAF9] text-[10px]">Pagó</p>
-                        <p className="text-white font-bold">${item.valorPagado}</p>
+                        <p className="text-white font-bold">${item.valorPagado.toLocaleString('es-AR')}</p>
                       </div>
                       <div>
                         <p className="text-[#FBDAF9] text-[10px]">Ahorró</p>
-                        <p className="text-white font-extrabold">${item.valorOriginal - item.valorPagado}</p>
+                        <p className="text-white font-extrabold">${(item.valorOriginal - item.valorPagado).toLocaleString('es-AR')}</p>
                       </div>
                     </div>
                   </div>
