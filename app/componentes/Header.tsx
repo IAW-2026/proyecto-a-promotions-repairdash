@@ -11,7 +11,9 @@ export default function Header() {
 
   const isAdmin = pathname.startsWith('/admin');
 
-  const links = isAdmin 
+  const links = !user
+    ? []
+    : isAdmin
     ? [
         { href: '/admin', label: 'Inicio' },
         { href: '/admin/promociones', label: 'Promociones' },
@@ -22,7 +24,6 @@ export default function Header() {
         { href: '/promociones', label: 'Promociones' },
         { href: '/historial', label: 'Historial' },
       ];
-
 
   return (
     <header className="w-full px-4 md:px-8 py-6 bg-[#1f0627] border-b border-[#8D62A5]">
@@ -40,71 +41,70 @@ export default function Header() {
               key={link.href}
               href={link.href}
               className={`text-base font-medium transition-colors px-4 ${
-                pathname === link.href
-                  ? 'text-[#F500F1]'
-                  : 'text-[#FBDAF9] hover:text-[#F500F1]'
+                pathname === link.href ? 'text-[#F500F1]' : 'text-[#FBDAF9] hover:text-[#F500F1]'
               }`}
             >
               {link.label}
             </Link>
           ))}
 
-          {/* Usuario + cerrar sesión */}
-          <div className="flex items-center gap-3 ml-4 pl-4 border-l border-[#8D62A5]">
-            {user && (
+          {user ? (
+            <div className="flex items-center gap-3 ml-4 pl-4 border-l border-[#8D62A5]">
               <span className="text-[#FBDAF9] text-sm">
                 {user.firstName ?? user.emailAddresses[0].emailAddress}
               </span>
-            )}
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "w-8 h-8",
-                }
-              }}
-            />
-          </div>
+              <UserButton appearance={{ elements: { avatarBox: "w-8 h-8" } }} />
+            </div>
+          ) : (
+            <Link
+              href="/sign-in"
+              className="ml-4 text-sm font-bold text-[#F500F1] border border-[#F500F1] px-4 py-1.5 rounded-lg hover:bg-[#F500F1] hover:text-white transition-colors"
+            >
+              Iniciar sesión
+            </Link>
+          )}
         </nav>
 
-        {/* Mobile - botón hamburguesa + avatar */}
+        {/* Mobile */}
         <div className="md:hidden flex items-center gap-3">
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox: "w-8 h-8",
-              }
-            }}
-          />
-          <button
-            className="text-[#FBDAF9] p-2"
-            onClick={() => setMenuAbierto(!menuAbierto)}
-            aria-label="Menú"
-          >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d={menuAbierto ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-            </svg>
-          </button>
+          {user ? (
+            <>
+              <UserButton appearance={{ elements: { avatarBox: "w-8 h-8" } }} />
+              <button
+                className="text-[#FBDAF9] p-2"
+                onClick={() => setMenuAbierto(!menuAbierto)}
+                aria-label="Menú"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d={menuAbierto ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+                </svg>
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/sign-in"
+              className="text-sm font-bold text-[#F500F1] border border-[#F500F1] px-3 py-1.5 rounded-lg hover:bg-[#F500F1] hover:text-white transition-colors"
+            >
+              Iniciar sesión
+            </Link>
+          )}
         </div>
       </div>
 
       {/* Mobile - menú desplegable */}
-      {menuAbierto && (
+      {menuAbierto && user && (
         <nav className="md:hidden mt-4 flex flex-col gap-4 px-4">
-          {user && (
-            <span className="text-[#FBDAF9] text-sm border-b border-[#8D62A5] pb-3">
-              {user.firstName ?? user.emailAddresses[0].emailAddress}
-            </span>
-          )}
+          <span className="text-[#FBDAF9] text-sm border-b border-[#8D62A5] pb-3">
+            {user.firstName ?? user.emailAddresses[0].emailAddress}
+          </span>
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setMenuAbierto(false)}
               className={`text-sm font-medium transition-colors ${
-                pathname === link.href
-                  ? 'text-[#F500F1]'
-                  : 'text-[#FBDAF9] hover:text-[#F500F1]'
+                pathname === link.href ? 'text-[#F500F1]' : 'text-[#FBDAF9] hover:text-[#F500F1]'
               }`}
             >
               {link.label}
