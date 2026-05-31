@@ -76,7 +76,24 @@ export default function BuscarPromociones({
     setExtrasPendientes(inicial);
   }, [queryNombre, stringServiciosUrl, stringExtrasUrl]);
 
-  // Función unificada para aplicar la búsqueda por texto
+  // Cierra los filtros automáticamente al hacer click o tap fuera del panel abierto
+  useEffect(() => {
+    const escucharClickAfuera = (evento: MouseEvent) => {
+      if (
+        detailsRef.current &&
+        detailsRef.current.hasAttribute('open') &&
+        !detailsRef.current.contains(evento.target as Node)
+      ) {
+        detailsRef.current.removeAttribute('open');
+      }
+    };
+
+    document.addEventListener('click', escucharClickAfuera);
+    return () => {
+      document.removeEventListener('click', escucharClickAfuera);
+    };
+  }, []);
+
   const ejecutarBusquedaTexto = (valorTexto: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('page');
@@ -94,13 +111,11 @@ export default function BuscarPromociones({
       router.replace(nuevaUrl, { scroll: false });
     });
 
-    // Cierra el teclado en dispositivos móviles de forma segura
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
   };
 
-  // Manejador del Submit del formulario (cuando tocan "Buscar" en el teclado o el nuevo botón)
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     ejecutarBusquedaTexto(query);
@@ -152,7 +167,6 @@ export default function BuscarPromociones({
     searchParamsRef.current = searchParams;
   }, [searchParams]);
 
-  // Mantenemos el Debounce automático por si escriben lento, pero ahora no interfiere si deciden presionar Enter antes
   useEffect(() => {
     const timeout = setTimeout(() => {
       const urlQuery = searchParamsRef.current.get('q') ?? '';
@@ -171,7 +185,6 @@ export default function BuscarPromociones({
   );
 
   return (
-    // Transformado en <form> para capturar el envío nativo del teclado
     <form onSubmit={handleFormSubmit} className="mb-8 rounded-2xl border border-[#C392DD]/30 bg-gradient-to-b from-[#1b0422] to-[#120217] p-5 shadow-[0_15px_35px_rgba(0,0,0,0.3)] backdrop-blur-md">
       <div className="flex flex-col lg:flex-row gap-4 w-full lg:items-end">
         
@@ -188,14 +201,13 @@ export default function BuscarPromociones({
             </svg>
             <input
               type="text"
-              enterKeyHint="search" // Cambia el texto del botón del teclado a "Buscar"
+              enterKeyHint="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Escribí para buscar..."
               className="h-11 w-full rounded-xl border border-[#8D62A5]/40 bg-[#271033]/60 pl-10 pr-12 text-sm text-white outline-none transition-all placeholder:text-[#8D62A5]/70 focus:border-[#F500F1] focus:bg-[#271033] focus:shadow-[0_0_15px_rgba(245,0,241,0.15)]"
             />
             
-            {/* Botón de envío táctil: se muestra solo cuando el usuario escribe algo en el input */}
             {query.trim().length > 0 && (
               <button
                 type="submit"
