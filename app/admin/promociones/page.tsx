@@ -5,6 +5,7 @@ import { DeleteButton } from './componentes/DeleteButton';
 import Paginacion from '../../componentes/Paginacion';
 import BuscarPromociones from '../../componentes/BuscarPromociones';
 import { obtenerTiposServicio } from '@/lib/tiposServicio';
+import BotonVolver from '@/app/componentes/BotonVolver';
 
 const POR_PAGINA = 6;
 
@@ -105,6 +106,7 @@ export default async function AdminPromociones({
       <Header />
       <main className="flex min-h-screen flex-col p-4 md:p-8 bg-[#271033] text-white">
         <section>
+          <BotonVolver href="/admin" />
           <div className="flex items-center justify-between mb-8 gap-4">
             <h2 className="text-3xl font-bold text-[#C392DD]">Gestión de Promociones</h2>
             <Link
