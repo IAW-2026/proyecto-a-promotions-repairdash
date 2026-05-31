@@ -31,15 +31,15 @@ export default function HistorialDeUso({ historial }: { historial: ItemHistorial
               <div className="flex items-center gap-8 shrink-0">
                 <div className="text-right">
                   <p className="text-[#8D62A5] text-xs mb-1">Original</p>
-                  <p className="text-[#FBDAF9] text-lg line-through">${item.valorOriginal}</p>
+                  <p className="text-[#FBDAF9] text-lg line-through">${item.valorOriginal.toLocaleString('es-AR')}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-[#8D62A5] text-xs mb-1">Pagaste</p>
-                  <p className="text-white text-2xl font-extrabold">${item.valorPagado}</p>
+                  <p className="text-white text-2xl font-extrabold">${item.valorPagado.toLocaleString('es-AR')}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-[#8D62A5] text-xs mb-1">Ahorraste</p>
-                  <p className="text-[#F500F1] text-2xl font-extrabold">${item.valorOriginal - item.valorPagado}</p>
+                  <p className="text-[#F500F1] text-2xl font-extrabold">${(item.valorOriginal - item.valorPagado).toLocaleString('es-AR')}</p>
                 </div>
               </div>
             </div>
@@ -53,11 +53,11 @@ export default function HistorialDeUso({ historial }: { historial: ItemHistorial
               <div className="flex justify-between items-end pt-3 border-t border-[#C392DD]">
                 <div>
                   <p className="text-[#8D62A5] text-xs mb-1">Original</p>
-                  <p className="text-[#FBDAF9] text-base line-through">${item.valorOriginal}</p>
+                  <p className="text-[#FBDAF9] text-base line-through">${item.valorOriginal.toLocaleString('es-AR')}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-[#8D62A5] text-xs mb-1">Pagaste</p>
-                  <p className="text-white text-xl font-extrabold">${item.valorPagado}</p>
+                  <p className="text-white text-xl font-extrabold">${item.valorPagado.toLocaleString('es-AR')}</p>
                 </div>
               </div>
             </div>

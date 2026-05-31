@@ -52,7 +52,7 @@ export default async function PaginaHistorial({
   return (
     <>
       <Header />
-      <main className="p-4 md:p-8 bg-[#271033] text-white">
+      <main className="min-h-[calc(100vh-76px)] flex flex-col justify-between p-4 md:p-8 bg-[#271033] text-white">
         <section>
           <h2 className="text-3xl font-bold text-[#C392DD] mb-2 text-center">
             Historial de Promociones Usadas
@@ -65,12 +65,12 @@ export default async function PaginaHistorial({
             <div className="mb-8 p-6 bg-[#1b0422] rounded-2xl border border-[#C392DD] flex flex-col md:flex-row justify-around items-center gap-4 text-center">
               <div>
                 <p className="text-[#FBDAF9] text-sm mb-1">Promociones usadas</p>
-                <p className="text-3xl font-bold text-[#F500F1]">{total}</p>
+                <p className="text-3xl font-bold text-[#F500F1]">{total.toLocaleString('es-AR')}</p>
               </div>
               <div className="hidden md:block w-px h-12 bg-[#8D62A5]" />
               <div>
                 <p className="text-[#FBDAF9] text-sm mb-1">Total ahorrado</p>
-                <p className="text-3xl font-bold text-[#F500F1]">${ahorro}</p>
+                <p className="text-3xl font-bold text-[#F500F1]">${ahorro.toLocaleString('es-AR')}</p>
               </div>
             </div>
           )}
@@ -96,9 +96,9 @@ export default async function PaginaHistorial({
                     <span className="text-white font-extrabold">{item.nombre}</span>
                     <span className="text-[#C392DD] font-semibold">#{item.trabajoId}</span>
                     <span className="text-[#FBDAF9] text-sm">{item.fechaUso}</span>
-                    <span className="text-[#FBDAF9] line-through">${item.valorOriginal}</span>
-                    <span className="text-white font-bold">${item.valorPagado}</span>
-                    <span className="text-white font-bold">${item.valorOriginal - item.valorPagado}</span>
+                    <span className="text-[#FBDAF9] line-through">${item.valorOriginal.toLocaleString('es-AR')}</span>
+                    <span className="text-white font-bold">${item.valorPagado.toLocaleString('es-AR')}</span>
+                    <span className="text-white font-bold">${(item.valorOriginal - item.valorPagado).toLocaleString('es-AR')}</span>
                   </div>
                 ))}
               </div>
@@ -116,15 +116,15 @@ export default async function PaginaHistorial({
                     <div className="flex justify-between pt-3 border-t border-[#C392DD]">
                       <div>
                         <p className="text-[#FBDAF9] text-xs mb-1">Precio original</p>
-                        <p className="text-[#FBDAF9] line-through">${item.valorOriginal}</p>
+                        <p className="text-[#FBDAF9] line-through">${item.valorOriginal.toLocaleString('es-AR')}</p>
                       </div>
                       <div>
                         <p className="text-[#FBDAF9] text-xs mb-1">Pagaste</p>
-                        <p className="text-white font-bold text-lg">${item.valorPagado}</p>
+                        <p className="text-white font-bold text-lg">${item.valorPagado.toLocaleString('es-AR')}</p>
                       </div>
                       <div>
                         <p className="text-[#FBDAF9] text-xs mb-1">Ahorraste</p>
-                        <p className="text-white font-bold text-lg">${item.valorOriginal - item.valorPagado}</p>
+                        <p className="text-white font-bold text-lg">${(item.valorOriginal - item.valorPagado).toLocaleString('es-AR')}</p>
                       </div>
                     </div>
                   </div>

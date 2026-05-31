@@ -17,7 +17,11 @@ function CartaPromocion({ promo }: { promo: Promocion }) {
       <h4 className="text-xl font-extrabold text-white mb-2">{promo.nombre}</h4>
       <p className="text-[#FBDAF9] mb-1">
         <span className="font-semibold text-[#F500F1] bg-[#271033] px-2 py-1 rounded">
-          {promo.tipoDescuento}{promo.valor} off
+          {promo.tipoDescuento}
+          {promo.tipoDescuento === '$'
+            ? promo.valor.toLocaleString('es-AR')
+            : promo.valor}{' '}
+          off
         </span>
       </p>
       <p className="text-[#FBDAF9] mb-4 break-words whitespace-normal">{promo.descripcion}</p>
@@ -27,6 +31,7 @@ function CartaPromocion({ promo }: { promo: Promocion }) {
 
 export default function CarruselPromociones({ promociones }: { promociones: Promocion[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const mostrarFlechas = promociones.length > 2;
 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -45,10 +50,9 @@ export default function CarruselPromociones({ promociones }: { promociones: Prom
       </div>
 
       <div className="flex-1 min-w-0 relative">
-        {/* Flecha izquierda */}
         <button
           onClick={() => scroll("left")}
-          className="hidden md:flex absolute left-0 top-1/2 -translate-y-2/3 -translate-x-4 z-10 text-[#C392DD] hover:text-white transition-colors"
+          className={`absolute left-0 top-1/2 -translate-y-2/3 -translate-x-4 z-10 text-[#C392DD] hover:text-white transition-colors ${mostrarFlechas ? 'hidden md:flex' : 'hidden'}`}
           aria-label="Anterior"
         >
           <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -67,7 +71,7 @@ export default function CarruselPromociones({ promociones }: { promociones: Prom
 
         <button
           onClick={() => scroll("right")}
-          className="hidden md:flex absolute right-0 top-1/2 -translate-y-2/3 translate-x-4 z-10 text-[#C392DD] hover:text-white transition-colors"
+          className={`absolute right-0 top-1/2 -translate-y-2/3 translate-x-4 z-10 text-[#C392DD] hover:text-white transition-colors ${mostrarFlechas ? 'hidden md:flex' : 'hidden'}`}
           aria-label="Siguiente"
         >
           <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
