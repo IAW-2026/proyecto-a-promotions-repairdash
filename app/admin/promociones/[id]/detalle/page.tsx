@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { obtenerTiposServicio } from '@/lib/tiposServicio';
+import BotonVolver from '@/app/componentes/BotonVolver';
 
 type FiltroUsuarios = {
   idsEspecificos?: string[];
@@ -130,11 +131,8 @@ export default async function DetallePromocion({
       <Header />
       <main className="flex min-h-screen flex-col p-4 md:p-8 bg-[#271033] text-white">
         <section className="max-w-3xl mx-auto w-full">
-          <div className="flex items-center justify-between gap-4 mb-8">
-            <Link href="/admin/promociones" className="text-[#C392DD] hover:text-white transition-colors">
-              ← Volver
-            </Link>
-
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <BotonVolver href="/admin/promociones" />
             <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase border ${estadoClases}`}>
               {estado}
             </span>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { currentUser } from '@clerk/nextjs/server';
 import Paginacion from '../componentes/Paginacion';
 import RiderAppLink from '../componentes/RiderAppLink';
+import BotonVolver from '../componentes/BotonVolver';
 
 const POR_PAGINA = 6;
 
@@ -54,6 +55,7 @@ export default async function PaginaHistorial({
       <Header />
       <main className="min-h-[calc(100vh-76px)] flex flex-col justify-between p-4 md:p-8 bg-[#271033] text-white">
         <section>
+          <BotonVolver href="/" />
           <h2 className="text-3xl font-bold text-[#C392DD] mb-2 text-center">
             Historial de Promociones Usadas
           </h2>

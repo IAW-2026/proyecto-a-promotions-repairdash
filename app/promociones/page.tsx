@@ -7,6 +7,7 @@ import RiderAppLink from '../componentes/RiderAppLink';
 import Link from 'next/link';
 import BuscarPromociones from '../componentes/BuscarPromociones';
 import { obtenerTiposServicio } from '@/lib/tiposServicio';
+import BotonVolver from '../componentes/BotonVolver';
 
 const POR_PAGINA = 9;
 
@@ -68,6 +69,7 @@ export default async function PaginaPromociones({
       <Header />
       <main className="min-h-screen p-4 md:p-8 bg-[#271033] text-white">
         <section className="max-w-7xl mx-auto">
+          <BotonVolver href="/" />
           <h2 className="text-3xl font-bold text-[#C392DD] mb-4 text-center">
             Todas las promociones
           </h2>
