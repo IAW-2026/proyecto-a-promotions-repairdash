@@ -95,7 +95,7 @@ export default async function PaginaPromociones({
                 className="p-6 bg-[#8D62A5] rounded-2xl border border-[#C392DD] flex flex-col gap-4 md:grid md:grid-cols-[1fr_auto] md:items-start"
               >
                 <div className="flex flex-col gap-3 md:order-1">
-                  <h3 className="text-xl font-bold text-white">{promo.nombre}</h3>
+                  <h3 className="text-xl font-bold text-[#2f143d]">{promo.nombre}</h3>
                   <span className="inline-flex items-center bg-[#271033] text-[#F500F1] font-bold px-3 py-1 text-sm rounded-md w-fit whitespace-nowrap">
                     {promo.tipoDescuento}
                     {promo.tipoDescuento === "$"
