@@ -7,6 +7,7 @@ import { obtenerTiposServicio } from '@/lib/tiposServicio';
 import { usuarioCalifica } from '@/lib/filtroUsuarios';
 import { currentUser } from '@clerk/nextjs/server';
 import RiderAppLink from '@/app/componentes/RiderAppLink';
+import BotonVolver from '@/app/componentes/BotonVolver';
 
 type FiltroUsuarios = {
   idsEspecificos?: string[];
@@ -94,12 +95,7 @@ export default async function DetallePromocion({
       <main className="flex min-h-screen flex-col p-4 md:p-8 bg-[#271033] text-white">
         <section className="max-w-2xl mx-auto w-full">
           
-          {/* Botón Volver */}
-          <div className="flex items-center justify-between gap-4 mb-6">
-            <Link href="/promociones" className="text-[#C392DD] hover:text-white transition-colors text-sm font-semibold flex items-center gap-1">
-              ← Volver a mis promociones
-            </Link>
-          </div>
+          <BotonVolver href="/promociones" />
 
           <div className="flex flex-col gap-6 bg-[#1b0422] p-6 md:p-8 rounded-3xl border border-[#C392DD]/40 shadow-xl">
             

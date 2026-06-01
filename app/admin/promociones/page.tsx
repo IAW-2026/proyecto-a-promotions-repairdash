@@ -5,6 +5,8 @@ import { DeleteButton } from './componentes/DeleteButton';
 import Paginacion from '../../componentes/Paginacion';
 import BuscarPromociones from '../../componentes/BuscarPromociones';
 import { obtenerTiposServicio } from '@/lib/tiposServicio';
+import BotonVolver from '@/app/componentes/BotonVolver';
+import { redirect } from 'next/navigation';
 
 const POR_PAGINA = 6;
 
@@ -95,6 +97,17 @@ export default async function AdminPromociones({
     coincideFiltroUsuarios(promo.filtroUsuarios, usuariosSeleccionados)
   );
   const totalPaginas = Math.ceil(promocionesFiltradas.length / POR_PAGINA);
+
+  if (paginaActual > totalPaginas && totalPaginas > 0) {
+    const queryParams = new URLSearchParams();
+    if (queryNombre) queryParams.set('q', queryNombre);
+    serviciosSeleccionados.forEach(s => queryParams.append('servicio', s));
+    estadosSeleccionados.forEach(e => queryParams.append('estado', e));
+    usuariosSeleccionados.forEach(u => queryParams.append('usuarios', u));
+    queryParams.set('page', String(totalPaginas));
+    redirect(`/admin/promociones?${queryParams.toString()}`);
+  }
+
   const promociones = promocionesFiltradas.slice(
     (paginaActual - 1) * POR_PAGINA,
     paginaActual * POR_PAGINA
@@ -105,6 +118,7 @@ export default async function AdminPromociones({
       <Header />
       <main className="flex min-h-screen flex-col p-4 md:p-8 bg-[#271033] text-white">
         <section>
+          <BotonVolver href="/admin" />
           <div className="flex items-center justify-between mb-8 gap-4">
             <h2 className="text-3xl font-bold text-[#C392DD]">Gestión de Promociones</h2>
             <Link

@@ -1,6 +1,7 @@
 import Header from '../../componentes/Header';
 import { prisma } from '@/lib/prisma';
 import Paginacion from '../../componentes/Paginacion';
+import BotonVolver from '@/app/componentes/BotonVolver';
 
 type ItemHistorial = {
   id: number;
@@ -71,6 +72,7 @@ export default async function HistorialAdmin({
       <Header />
       <main className="flex min-h-screen flex-col p-4 md:p-8 bg-[#271033] text-white">
         <section>
+          <BotonVolver href="/admin" />
           <h2 className="text-3xl font-bold text-[#C392DD] mb-2 text-center">
             Panel de Control: Historial Global
           </h2>

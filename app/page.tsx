@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { currentUser } from '@clerk/nextjs/server';
 import { usuarioCalifica } from '@/lib/filtroUsuarios';
 import RiderAppLink from './componentes/RiderAppLink';
+import Link from 'next/link';
 
 export default async function PaginaInicio() {
   const user = await currentUser();
@@ -23,14 +24,61 @@ export default async function PaginaInicio() {
     },
   });
 
-  const promocionesActivas = (
-    await Promise.all(
-      todasLasPromos.map(async (promo) => {
-        const califica = await usuarioCalifica(user?.id ?? '', promo.filtroUsuarios as any);
-        return califica ? promo : null;
-      })
-    )
-  ).filter(Boolean);
+  const promocionesActivas = user
+  ? (
+      await Promise.all(
+        todasLasPromos.map(async (promo) => {
+          const califica = await usuarioCalifica(user.id, promo.filtroUsuarios as any);
+          return califica ? promo : null;
+        })
+      )
+    ).filter(Boolean)
+  : todasLasPromos;
+
+    const RIDER_APP_URL = process.env.NEXT_PUBLIC_RIDER_APP_URL!;
+
+    if (!user) {
+    return (
+      <>
+        <Header />
+       
+        <main className="flex min-h-screen flex-col p-4 md:p-8 pt-0 bg-[#271033] text-white w-full">
+           <Link
+              href={RIDER_APP_URL}
+              className="inline-flex items-center gap-2 mt-4 text-[#C392DD] hover:text-white transition-colors text-sm font-medium mb-6"
+            >
+              ← Volver a RiderApp
+            </Link>
+            <section className="text-center mb-12 mt-4">
+            <h2 className="text-4xl font-bold text-[#C392DD] mb-4">
+              ¡Disfruta de las promociones!
+            </h2>
+            <p className="text-[#FBDAF9] text-lg mb-8 max-w-md mx-auto">
+              Iniciá sesión para acceder a descuentos y ofertas exclusivos para vos.
+            </p>
+            <Link
+              href="/sign-in"
+              className="inline-block px-8 py-3 bg-[#F500F1] text-white rounded-xl font-bold text-lg hover:bg-[#c400c0] transition-colors shadow-[0_0_20px_rgba(245,0,241,0.3)]"
+            >
+              Iniciar sesión
+            </Link>
+          </section>
+            {promocionesActivas.length > 0 && (
+            <section className="mb-8">
+              <h3 className="text-2xl font-bold text-[#F500F1] mb-2 text-center">
+                Algunas promociones disponibles
+              </h3>
+              <CarruselPromociones promociones={promocionesActivas as any} />
+            </section>
+          )}
+
+          <footer className="mt-12 text-center text-[#FBDAF9] text-sm">
+            <p>RepairDash - Promociones</p>
+          </footer>
+        </main>
+      </>
+    );
+  }
 
   const historialPromociones = (
     await prisma.historialDeUso.findMany({
