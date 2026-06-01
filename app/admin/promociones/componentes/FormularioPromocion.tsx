@@ -293,7 +293,6 @@ export default function FormularioPromocion(props: Props) {
 
           <div className="flex flex-col gap-5 bg-[#1b0422] p-8 rounded-2xl border border-[#C392DD]">
 
-            {/* Nombre */}
             <div className="flex flex-col gap-1">
               <label className="text-[#C392DD] text-sm font-semibold">Nombre*</label>
               <input
@@ -306,7 +305,6 @@ export default function FormularioPromocion(props: Props) {
               {errores.nombre && <p className="text-red-400 text-xs mt-1">{errores.nombre}</p>}
             </div>
 
-            {/* Tipo y valor */}
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex flex-col gap-1 md:w-1/3">
                 <label className="text-[#C392DD] text-sm font-semibold">Tipo</label>
@@ -335,7 +333,6 @@ export default function FormularioPromocion(props: Props) {
               </div>
             </div>
 
-            {/* Descripción */}
             <div className="flex flex-col gap-1">
               <label className="text-[#C392DD] text-sm font-semibold">
                 Descripción <span className="text-[#8D62A5] font-normal">(opcional)</span>
@@ -349,7 +346,6 @@ export default function FormularioPromocion(props: Props) {
               />
             </div>
 
-            {/* Precio mínimo */}
             <div className="flex flex-col gap-1">
               <label className="text-[#C392DD] text-sm font-semibold">
                 Precio mínimo{form.tipoDescuento === '$' ? '*' : ''}
@@ -366,7 +362,6 @@ export default function FormularioPromocion(props: Props) {
               {errores.precioMinimo && <p className="text-red-400 text-xs mt-1">{errores.precioMinimo}</p>}
             </div>
 
-            {/* Fechas */}
             <div className="flex flex-col gap-4 pt-4 border-t border-[#8D62A5]">
               <h3 className="text-[#C392DD] font-bold text-base">Vigencia por Fechas</h3>
               <div className="flex flex-col gap-1">
@@ -418,7 +413,6 @@ export default function FormularioPromocion(props: Props) {
               )}
             </div>
 
-            {/* Tipos de servicio */}
             <div className="pt-2 border-t border-[#8D62A5]">
               <TiposServicioSelector
                 value={categorias}
@@ -435,7 +429,6 @@ export default function FormularioPromocion(props: Props) {
               {errores.categorias && <p className="text-red-400 text-xs mt-2">{errores.categorias}</p>}
             </div>
 
-            {/* Checkboxes */}
             <div className="flex flex-col gap-3 pt-2 border-t border-[#8D62A5]">
               {[
                 { name: 'destacada', label: 'Destacada en el inicio' },
@@ -454,7 +447,6 @@ export default function FormularioPromocion(props: Props) {
               ))}
             </div>
 
-            {/* Filtro usuarios */}
             <div className="pt-2 border-t border-[#8D62A5]">
               <FiltroUsuariosSelector
                 value={filtroUsuarios}
