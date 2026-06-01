@@ -1,14 +1,8 @@
-type ItemHistorial = {
-  id: number;
-  nombre: string;
-  fechaUso: string;
-  valorPagado: number;
-  valorOriginal: number;
-};
+import type { ItemHistorialFormateado } from "@/types/promociones";
 
 const MAX_VISIBLE = 3;
 
-export default function HistorialDeUso({ historial }: { historial: ItemHistorial[] }) {
+export default function HistorialDeUso({ historial }: { historial: ItemHistorialFormateado[] }) {
   const recientes = historial.slice(0, MAX_VISIBLE);
 
   return historial.length === 0 ? (
@@ -22,7 +16,6 @@ export default function HistorialDeUso({ historial }: { historial: ItemHistorial
         {recientes.map((item) => (
           <div key={item.id} className="p-6 bg-[#1b0422] rounded-2xl border border-[#C392DD]">
             
-            {/* Desktop */}
             <div className="hidden md:flex items-center justify-between gap-4">
               <div className="flex items-center gap-8 flex-1 min-w-0">
                 <p className="text-white font-bold text-xl truncate">{item.nombre}</p>
@@ -44,7 +37,6 @@ export default function HistorialDeUso({ historial }: { historial: ItemHistorial
               </div>
             </div>
 
-            {/* Mobile */}
             <div className="flex flex-col gap-3 md:hidden">
               <div className="flex justify-between items-start">
                 <p className="text-white font-bold text-lg">{item.nombre}</p>

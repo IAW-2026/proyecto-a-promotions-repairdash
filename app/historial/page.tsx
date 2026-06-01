@@ -5,17 +5,9 @@ import { currentUser } from '@clerk/nextjs/server';
 import Paginacion from '../componentes/Paginacion';
 import RiderAppLink from '../componentes/RiderAppLink';
 import BotonVolver from '../componentes/BotonVolver';
+import type { FilaHistorial } from '@/types/promociones';
 
 const POR_PAGINA = 6;
-
-type ItemHistorial = {
-  id: number;
-  nombre: string;
-  fechaUso: Date;
-  valorPagado: number;
-  valorOriginal: number;
-  trabajoId: number;
-};
 
 export default async function PaginaHistorial({
   searchParams,
@@ -30,7 +22,7 @@ export default async function PaginaHistorial({
     where: { usuarioId: user?.id ?? '' },
   });
 
-  const historial: ItemHistorial[] = await prisma.historialDeUso.findMany({
+  const historial: FilaHistorial[] = await prisma.historialDeUso.findMany({
     where: { usuarioId: user?.id ?? '' },
     orderBy: { fechaUso: 'desc' },
     skip: (paginaActual - 1) * POR_PAGINA,

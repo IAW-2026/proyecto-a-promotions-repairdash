@@ -5,31 +5,16 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import FiltroUsuariosSelector from './FiltroUsuarios';
 import TiposServicioSelector from './TipoServicioSelector';
+import CamposVigencia from './CamposVigencia';
+import CheckboxesPromo from './CheckboxesPromo';
+import type { FiltroUsuarios } from '@/types/promociones';
+import type { PromoForm } from '@/types/promociones';
 
-type FiltroUsuarios = {
-  idsEspecificos?: string[];
-  registradosDespuesDe?: string;
-  registradosAntesDe?: string;
-  minimoUsos?: number;
-  maximoUsos?: number;
-};
-
-type PromoForm = {
-  nombre: string;
-  tipoDescuento: string;
-  valor: string;
-  descripcion: string;
-  precioMinimo: string;
-  destacada: boolean;
-  usoUnico: boolean;
-};
 
 type Errores = Partial<Record<keyof PromoForm | 'fechaFin' | 'filtroUsuarios' | 'categorias', string>>;
-
 type Props =
   | { modo: 'crear' }
   | { modo: 'editar'; promocionId: string };
-
 const formInicial: PromoForm = {
   nombre: '',
   tipoDescuento: '%',
@@ -44,18 +29,15 @@ function fechaLocalInicial() {
   const d = new Date();
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 }
-
 function fechaParaInput(fecha: string) {
   const d = new Date(fecha);
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 }
-
 function formatearMonto(valor: string): string {
   const num = parseInt(valor.replace(/\./g, ''), 10);
   if (isNaN(num)) return valor;
   return num.toLocaleString('es-AR');
 }
-
 function desformatearMonto(valor: string): string {
   return valor.replace(/\./g, '');
 }
@@ -64,7 +46,6 @@ export default function FormularioPromocion(props: Props) {
   const router = useRouter();
   const esEdicion = props.modo === 'editar';
   const promocionId = props.modo === 'editar' ? props.promocionId : null;
-
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(esEdicion);
   const [error, setError] = useState('');
@@ -82,7 +63,6 @@ export default function FormularioPromocion(props: Props) {
   const marcarCambios = useCallback(() => {
     if (!loadingData) setHayCambios(true);
   }, [loadingData]);
-
   const limpiarError = useCallback((campo: keyof Errores) => {
     setErrores((prev) => {
       const nuevos = { ...prev };
@@ -122,13 +102,11 @@ export default function FormularioPromocion(props: Props) {
 
     setErrores((prev) => {
       const nuevos = { ...prev };
-
       if (campo === 'nombre') {
         const v = valor ?? form.nombre;
         if (!v.trim()) nuevos.nombre = 'El nombre es obligatorio.';
         else delete nuevos.nombre;
       }
-
       if (campo === 'valor') {
         const v = valor ?? form.valor;
         const num = parseFloat(v);
@@ -140,7 +118,6 @@ export default function FormularioPromocion(props: Props) {
           delete nuevos.valor;
         }
       }
-
       if (campo === 'precioMinimo' || campo === 'valor') {
         const pm = contexto?.precioMinimo ?? form.precioMinimo;
         const val = campo === 'valor' ? (valor ?? form.valor) : form.valor;
@@ -158,14 +135,12 @@ export default function FormularioPromocion(props: Props) {
           delete nuevos.precioMinimo;
         }
       }
-
       if (campo === 'fechaFin') {
         const tiene = contexto?.tieneCaducidad ?? tieneCaducidad;
         const fFin = contexto?.fechaFin ?? fechaFin;
         if (tiene && !fFin) nuevos.fechaFin = 'Ingresá la fecha de finalización o desmarcá la opción.';
         else delete nuevos.fechaFin;
       }
-
       return nuevos;
     });
   }, [form, tieneCaducidad, fechaFin]);
@@ -181,19 +156,16 @@ export default function FormularioPromocion(props: Props) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     marcarCambios();
-
     if (name === 'valor' && form.tipoDescuento === '$') {
       const raw = desformatearMonto(value);
       setForm((prev) => ({ ...prev, valor: raw }));
       return;
     }
-
     if (name === 'precioMinimo') {
       const raw = desformatearMonto(value);
       setForm((prev) => ({ ...prev, precioMinimo: raw }));
       return;
     }
-
     setForm((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
@@ -202,16 +174,13 @@ export default function FormularioPromocion(props: Props) {
 
   const validarTodo = (): boolean => {
     const nuevos: Errores = {};
-
     if (!form.nombre.trim()) nuevos.nombre = 'El nombre es obligatorio.';
-
     const valorNum = parseFloat(form.valor);
     if (!form.valor || isNaN(valorNum)) {
       nuevos.valor = 'El valor es obligatorio.';
     } else if (form.tipoDescuento === '%' && (valorNum <= 1 || valorNum >= 100)) {
       nuevos.valor = 'El porcentaje debe ser mayor a 1 y menor a 100.';
     }
-
     if (form.tipoDescuento === '$') {
       const pmNum = parseFloat(form.precioMinimo);
       if (!form.precioMinimo || isNaN(pmNum)) {
@@ -220,11 +189,8 @@ export default function FormularioPromocion(props: Props) {
         nuevos.precioMinimo = `El precio mínimo debe ser al menos $${valorNum.toLocaleString('es-AR')}.`;
       }
     }
-
     if (tieneCaducidad && !fechaFin) nuevos.fechaFin = 'Ingresá la fecha de finalización o desmarcá la opción.';
-    //if (categorias.length === 0) nuevos.categorias = 'Seleccioná al menos un tipo de servicio.';
     if (filtroConError) nuevos.filtroUsuarios = 'El filtro de usuarios tiene errores. Revisalo antes de guardar.';
-
     setErrores(nuevos);
     return Object.keys(nuevos).length === 0;
   };
@@ -233,7 +199,6 @@ export default function FormularioPromocion(props: Props) {
     if (!validarTodo()) return;
     setLoading(true);
     setError('');
-
     const res = await fetch(
       esEdicion ? `/api/admin/promociones/${promocionId}` : '/api/admin/promociones',
       {
@@ -250,7 +215,6 @@ export default function FormularioPromocion(props: Props) {
         }),
       }
     );
-
     if (res.ok) {
       setHayCambios(false);
       if (esEdicion) {
@@ -276,7 +240,6 @@ export default function FormularioPromocion(props: Props) {
       </>
     );
   }
-
   return (
     <>
       <Header />
@@ -293,7 +256,6 @@ export default function FormularioPromocion(props: Props) {
 
           <div className="flex flex-col gap-5 bg-[#1b0422] p-8 rounded-2xl border border-[#C392DD]">
 
-            {/* Nombre */}
             <div className="flex flex-col gap-1">
               <label className="text-[#C392DD] text-sm font-semibold">Nombre*</label>
               <input
@@ -306,7 +268,6 @@ export default function FormularioPromocion(props: Props) {
               {errores.nombre && <p className="text-red-400 text-xs mt-1">{errores.nombre}</p>}
             </div>
 
-            {/* Tipo y valor */}
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex flex-col gap-1 md:w-1/3">
                 <label className="text-[#C392DD] text-sm font-semibold">Tipo</label>
@@ -335,7 +296,6 @@ export default function FormularioPromocion(props: Props) {
               </div>
             </div>
 
-            {/* Descripción */}
             <div className="flex flex-col gap-1">
               <label className="text-[#C392DD] text-sm font-semibold">
                 Descripción <span className="text-[#8D62A5] font-normal">(opcional)</span>
@@ -349,7 +309,6 @@ export default function FormularioPromocion(props: Props) {
               />
             </div>
 
-            {/* Precio mínimo */}
             <div className="flex flex-col gap-1">
               <label className="text-[#C392DD] text-sm font-semibold">
                 Precio mínimo{form.tipoDescuento === '$' ? '*' : ''}
@@ -366,59 +325,41 @@ export default function FormularioPromocion(props: Props) {
               {errores.precioMinimo && <p className="text-red-400 text-xs mt-1">{errores.precioMinimo}</p>}
             </div>
 
-            {/* Fechas */}
-            <div className="flex flex-col gap-4 pt-4 border-t border-[#8D62A5]">
-              <h3 className="text-[#C392DD] font-bold text-base">Vigencia por Fechas</h3>
-              <div className="flex flex-col gap-1">
-                <label className="text-[#FBDAF9] text-sm font-semibold">Fecha de Inicio</label>
-                <input
-                  type="datetime-local"
-                  value={fechaInicio}
-                  onChange={(e) => {
-                    marcarCambios();
-                    setFechaInicio(e.target.value);
-                  }}
-                  className="bg-[#271033] border border-[#8D62A5] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1] w-full [color-scheme:dark]"
-                />
-              </div>
+            <CamposVigencia
+              fechaInicio={fechaInicio}
+              tieneCaducidad={tieneCaducidad}
+              fechaFin={fechaFin}
+              errorFechaFin={errores.fechaFin}
+              onFechaInicio={(value) => {
+                marcarCambios();
+                setFechaInicio(value);
+              }}
+              onTieneCaducidad={(value) => {
+                marcarCambios();
+                setTieneCaducidad(value);
+                if (!value) {
+                  setFechaFin('');
+                  setErrores((prev) => {
+                    const nuevos = { ...prev };
+                    delete nuevos.fechaFin;
+                    return nuevos;
+                  });
+                }
+              }}
+              onFechaFin={(value) => {
+                marcarCambios();
+                setFechaFin(value);
+              }}
+              onBlurFechaFin={() => validarCampo('fechaFin')}
+              onLimpiarErrorFechaFin={() => {
+                setErrores((prev) => {
+                  const nuevos = { ...prev };
+                  delete nuevos.fechaFin;
+                  return nuevos;
+                });
+              }}
+            />
 
-              <label className="flex items-center gap-3 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={tieneCaducidad}
-                  onChange={(e) => {
-                    marcarCambios();
-                    setTieneCaducidad(e.target.checked);
-                    if (!e.target.checked) {
-                      setFechaFin('');
-                      setErrores((prev) => { const n = { ...prev }; delete n.fechaFin; return n; });
-                    }
-                  }}
-                  className="w-4 h-4 accent-[#F500F1]"
-                />
-                <span className="text-[#FBDAF9] text-sm">¿Esta promoción tiene fecha de vencimiento?</span>
-              </label>
-
-              {tieneCaducidad && (
-                <div className="flex flex-col gap-1 pl-4 border-l-2 border-[#8D62A5]">
-                  <label className="text-[#FBDAF9] text-sm font-semibold">Fecha de Finalización*</label>
-                  <input
-                    type="datetime-local"
-                    value={fechaFin}
-                    onChange={(e) => {
-                      marcarCambios();
-                      setFechaFin(e.target.value);
-                    }}
-                    onBlur={() => validarCampo('fechaFin')}
-                    min={fechaInicio}
-                    className={`bg-[#271033] border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1] w-full [color-scheme:dark] ${errores.fechaFin ? 'border-red-500' : 'border-[#8D62A5]'}`}
-                  />
-                  {errores.fechaFin && <p className="text-red-400 text-xs mt-1">{errores.fechaFin}</p>}
-                </div>
-              )}
-            </div>
-
-            {/* Tipos de servicio */}
             <div className="pt-2 border-t border-[#8D62A5]">
               <TiposServicioSelector
                 value={categorias}
@@ -435,26 +376,8 @@ export default function FormularioPromocion(props: Props) {
               {errores.categorias && <p className="text-red-400 text-xs mt-2">{errores.categorias}</p>}
             </div>
 
-            {/* Checkboxes */}
-            <div className="flex flex-col gap-3 pt-2 border-t border-[#8D62A5]">
-              {[
-                { name: 'destacada', label: 'Destacada en el inicio' },
-                { name: 'usoUnico', label: 'Uso único por usuario' },
-              ].map(({ name, label }) => (
-                <label key={name} className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    name={name}
-                    checked={form[name as keyof PromoForm] as boolean}
-                    onChange={handleChange}
-                    className="w-4 h-4 accent-[#F500F1]"
-                  />
-                  <span className="text-[#FBDAF9]">{label}</span>
-                </label>
-              ))}
-            </div>
+            <CheckboxesPromo form={form} onChange={handleChange} />
 
-            {/* Filtro usuarios */}
             <div className="pt-2 border-t border-[#8D62A5]">
               <FiltroUsuariosSelector
                 value={filtroUsuarios}

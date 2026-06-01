@@ -1,20 +1,33 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
+import { requireAdminPromotions } from '@/lib/auth';
+import { auth } from '@clerk/nextjs/server';
 
 type RouteParams = {
   params: Promise<{ id: string }>;
 };
 
 export async function GET(_req: Request, { params }: RouteParams) {
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: 'No autorizado. Iniciá sesión.' }, { status: 401 });
+  }
+
   const { id } = await params;
-  const promo = await prisma.promocion.findUnique({ where: { id: parseInt(id) } });
+  const idPromocion = parseInt(id);
+
+  if (isNaN(idPromocion)) {
+    return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
+  }
+
+  const promo = await prisma.promocion.findUnique({ where: { id: idPromocion } });
   return NextResponse.json(promo);
 }
 
-export async function DELETE(
-  _request: Request,
-  { params }: RouteParams 
-) {
+export async function DELETE(_request: Request, { params }: RouteParams) {
+  const authError = await requireAdminPromotions();
+  if (authError) return authError;
+
   try {
     const { id } = await params;
     const idPromocion = parseInt(id);
@@ -36,21 +49,40 @@ export async function DELETE(
 }
 
 export async function PATCH(req: Request, { params }: RouteParams) {
+  const authError = await requireAdminPromotions();
+  if (authError) return authError;
+
   try {
     const { id } = await params;
-    const body = await req.json();
+    const idPromocion = parseInt(id);
 
+    if (isNaN(idPromocion)) {
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
+    }
+
+    const body = await req.json();
     const { id: _id, ...datos } = body;
 
     const promo = await prisma.promocion.update({
-      where: { id: parseInt(id) },
+      where: { id: idPromocion },
       data: {
-        ...datos,
-        valor: parseFloat(datos.valor),
-        precioMinimo: datos.precioMinimo ? parseFloat(datos.precioMinimo) : null,
+        nombre: datos.nombre,
+        tipoDescuento: datos.tipoDescuento,
+        descripcion: datos.descripcion,
+        destacada: datos.destacada !== undefined ? Boolean(datos.destacada) : undefined,
+        usoUnico: datos.usoUnico !== undefined ? Boolean(datos.usoUnico) : undefined,
+        valor: datos.valor !== undefined ? parseFloat(String(datos.valor)) : undefined,
+        precioMinimo: datos.precioMinimo !== undefined 
+          ? (datos.precioMinimo ? parseFloat(String(datos.precioMinimo)) : null) 
+          : undefined,
         categorias: typeof datos.categorias === 'string' 
           ? datos.categorias.split(',').map((c: string) => c.trim()) 
-          : datos.categorias
+          : datos.categorias,
+        fechaInicio: datos.fechaInicio ? new Date(datos.fechaInicio) : undefined,
+        fechaFin: datos.fechaFin !== undefined 
+          ? (datos.fechaFin ? new Date(datos.fechaFin) : null) 
+          : undefined,
+        filtroUsuarios: datos.filtroUsuarios !== undefined ? datos.filtroUsuarios : undefined,
       },
     });
 

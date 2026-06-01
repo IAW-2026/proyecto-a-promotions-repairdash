@@ -2,16 +2,7 @@ import Header from '../../componentes/Header';
 import { prisma } from '@/lib/prisma';
 import Paginacion from '../../componentes/Paginacion';
 import BotonVolver from '@/app/componentes/BotonVolver';
-
-type ItemHistorial = {
-  id: number;
-  nombre: string;
-  fechaUso: Date;
-  valorPagado: number;
-  valorOriginal: number;
-  trabajoId: number;
-  usuarioId: string;
-};
+import type { ItemHistorial } from '@/types/promociones';
 
 function abreviarId(id: string) {
   return `...${id.slice(-6)}`;
