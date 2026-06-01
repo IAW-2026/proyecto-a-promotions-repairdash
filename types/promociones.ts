@@ -6,6 +6,12 @@ export type FiltroUsuarios = {
   maximoUsos?: number;
 };
 
+export type Usuario = {
+  id: string;
+  nombre: string;
+  fechaRegistro: string;
+};
+
 export type Promocion = {
   id: number;
   nombre: string;
