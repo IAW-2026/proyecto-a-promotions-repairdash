@@ -76,7 +76,6 @@ export default function BuscarPromociones({
     setExtrasPendientes(inicial);
   }, [queryNombre, stringServiciosUrl, stringExtrasUrl]);
 
-  // Cierra los filtros automáticamente al hacer click o tap fuera del panel abierto
   useEffect(() => {
     const escucharClickAfuera = (evento: MouseEvent) => {
       if (
@@ -97,20 +96,16 @@ export default function BuscarPromociones({
   const ejecutarBusquedaTexto = (valorTexto: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('page');
-
     if (!valorTexto.trim()) {
       params.delete('q');
     } else {
       params.set('q', valorTexto.trim());
     }
-
     const nuevaUrl = params.toString() ? `${basePath}?${params.toString()}` : basePath;
     isLocalChange.current = true;
-    
     startTransition(() => {
       router.replace(nuevaUrl, { scroll: false });
     });
-
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
@@ -124,23 +119,18 @@ export default function BuscarPromociones({
   const aplicarFiltrosManuales = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('page');
-
     params.delete('servicio');
     serviciosPendientes.filter(Boolean).forEach((item) => params.append('servicio', item));
-
     filtrosExtra.forEach((filtro) => {
       params.delete(filtro.nombre);
       const seleccionados = extrasPendientes[filtro.nombre] || [];
       seleccionados.filter(Boolean).forEach((item) => params.append(filtro.nombre, item));
     });
-
     const queryString = params.toString();
     const nuevaUrl = queryString ? `${basePath}?${queryString}` : basePath;
-
     startTransition(() => {
       router.replace(nuevaUrl, { scroll: false });
     });
-
     if (detailsRef.current) {
       detailsRef.current.removeAttribute('open');
     }

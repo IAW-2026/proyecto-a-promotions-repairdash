@@ -8,24 +8,15 @@ import { usuarioCalifica } from '@/lib/filtroUsuarios';
 import { currentUser } from '@clerk/nextjs/server';
 import RiderAppLink from '@/app/componentes/RiderAppLink';
 import BotonVolver from '@/app/componentes/BotonVolver';
-
-type FiltroUsuarios = {
-  idsEspecificos?: string[];
-  registradosDespuesDe?: string;
-  registradosAntesDe?: string;
-  minimoUsos?: number;
-  maximoUsos?: number;
-};
+import type { FiltroUsuarios } from '@/types/promociones';
 
 function esFiltroUsuarios(value: unknown): value is FiltroUsuarios {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
-
 function formatearMonto(valor: number | null) {
   if (valor === null || valor === 0) return 'Sin mínimo de compra requerido';
   return `$${valor.toLocaleString('es-AR')}`;
 }
-
 function formatearDescuento(tipo: string, valor: number) {
   return tipo === '$'
     ? `$${valor.toLocaleString('es-AR')}`

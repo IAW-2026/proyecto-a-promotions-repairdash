@@ -65,7 +65,6 @@ export default async function AdminDashboard() {
             </p>
           </div>
 
-          {/* Accesos directos */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             <Link href="/admin/promociones" className="group">
               <div className="h-full p-8 bg-[#1b0422] rounded-3xl border border-[#C392DD] hover:border-[#F500F1] transition-all flex flex-col justify-between">
@@ -108,14 +107,12 @@ export default async function AdminDashboard() {
             </Link>
           </div>
 
-          {/* Métricas generales */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <TarjetaMetrica label="Promociones activas" valor={totalPromos} icono={iconoTag} />
             <TarjetaMetrica label="Usos totales" valor={totalUsos} icono={iconoBarras} />
             <TarjetaMetrica label="Usos últimos 30 días" valor={usos30Dias} icono={iconoCalendario} />
           </div>
 
-          {/* Métricas de alerta */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
             <TarjetaMetrica label="Por vencer en 7 días" valor={porVencer} alerta icono={iconoReloj} />
             <TarjetaMetrica label="Caducadas sin eliminar" valor={caducadas} alerta icono={iconoBasura} />

@@ -17,7 +17,6 @@ type FiltroUsuariosPromo = {
 function obtenerParametro(valor: string | string[] | undefined) {
   return Array.isArray(valor) ? valor[0] ?? '' : valor ?? '';
 }
-
 function obtenerParametros(valor: string | string[] | undefined) {
   if (!valor) return [];
   return Array.isArray(valor) ? valor.filter(Boolean) : [valor];
@@ -134,7 +133,7 @@ export default async function AdminPromociones({
             queryNombre={queryNombre}
             serviciosSeleccionados={serviciosSeleccionados}
             tiposServicio={tiposServicio}
-            esAdmin={true} // <-- IMPORTANTE
+            esAdmin={true} 
             filtrosExtra={[
               {
                 nombre: 'estado',

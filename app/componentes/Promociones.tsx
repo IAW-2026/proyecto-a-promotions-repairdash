@@ -2,16 +2,9 @@
 import { useRef } from "react";
 import Link from 'next/link';
 import Image from 'next/image';
+import type { PromoDestacada } from "@/types/promociones";
 
-type Promocion = {
-  id: number;
-  nombre: string;
-  tipoDescuento: string;
-  valor: number;
-  descripcion: string;
-};
-
-function CartaPromocion({ promo }: { promo: Promocion }) {
+function CartaPromocion({ promo }: { promo: PromoDestacada }) {
   return (
     <div className="w-[320px] flex-shrink-0 snap-start p-6 bg-[#8D62A5] rounded-2xl shadow-lg border border-[#C392DD] hover:border-[#F500F1] transition-colors">
       <h4 className="text-xl font-extrabold text-white mb-2">{promo.nombre}</h4>
@@ -29,7 +22,7 @@ function CartaPromocion({ promo }: { promo: Promocion }) {
   );
 }
 
-export default function CarruselPromociones({ promociones }: { promociones: Promocion[] }) {
+export default function CarruselPromociones({ promociones }: { promociones: PromoDestacada[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const mostrarFlechas = promociones.length > 2;
 

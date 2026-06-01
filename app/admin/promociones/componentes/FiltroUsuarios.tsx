@@ -1,13 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-
-type FiltroUsuarios = {
-  idsEspecificos?: string[];
-  registradosDespuesDe?: string;
-  registradosAntesDe?: string;
-  minimoUsos?: number;
-  maximoUsos?: number;
-};
+import type { FiltroUsuarios } from '@/types/promociones';
 
 type Usuario = {
   id: string;
@@ -56,20 +49,16 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
       .then(setUsuarios);
   }, []);
 
-  // Validación de modo sin criterios
   useEffect(() => {
     if (modo === 'todos') {
       onError(false);
       return;
     }
-
     const hayErroresInternos = Object.values(errores).some((e) => e !== '');
-
     if (modo === 'filtros') {
       onError(hayErroresInternos || !tieneCriterios(filtro));
       return;
     }
-
     if (modo === 'especificos') {
       onError(hayErroresInternos || !tieneEspecificos(filtro));
       return;

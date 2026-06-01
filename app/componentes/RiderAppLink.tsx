@@ -7,7 +7,6 @@ export default function RiderAppLink() {
     const confirmed = window.confirm(
       "¿Estás seguro que querés abandonar la app de promociones para ir a RIDER APP?"
     );
-
     if (confirmed) {
       window.location.href = RIDER_APP_URL;
     }

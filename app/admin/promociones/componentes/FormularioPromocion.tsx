@@ -5,24 +5,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import FiltroUsuariosSelector from './FiltroUsuarios';
 import TiposServicioSelector from './TipoServicioSelector';
-
-type FiltroUsuarios = {
-  idsEspecificos?: string[];
-  registradosDespuesDe?: string;
-  registradosAntesDe?: string;
-  minimoUsos?: number;
-  maximoUsos?: number;
-};
-
-type PromoForm = {
-  nombre: string;
-  tipoDescuento: string;
-  valor: string;
-  descripcion: string;
-  precioMinimo: string;
-  destacada: boolean;
-  usoUnico: boolean;
-};
+import type { FiltroUsuarios } from '@/types/promociones';
+import type { PromoForm } from '@/types/promociones';
 
 type Errores = Partial<Record<keyof PromoForm | 'fechaFin' | 'filtroUsuarios' | 'categorias', string>>;
 
@@ -64,7 +48,6 @@ export default function FormularioPromocion(props: Props) {
   const router = useRouter();
   const esEdicion = props.modo === 'editar';
   const promocionId = props.modo === 'editar' ? props.promocionId : null;
-
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(esEdicion);
   const [error, setError] = useState('');
@@ -122,13 +105,11 @@ export default function FormularioPromocion(props: Props) {
 
     setErrores((prev) => {
       const nuevos = { ...prev };
-
       if (campo === 'nombre') {
         const v = valor ?? form.nombre;
         if (!v.trim()) nuevos.nombre = 'El nombre es obligatorio.';
         else delete nuevos.nombre;
       }
-
       if (campo === 'valor') {
         const v = valor ?? form.valor;
         const num = parseFloat(v);
@@ -140,7 +121,6 @@ export default function FormularioPromocion(props: Props) {
           delete nuevos.valor;
         }
       }
-
       if (campo === 'precioMinimo' || campo === 'valor') {
         const pm = contexto?.precioMinimo ?? form.precioMinimo;
         const val = campo === 'valor' ? (valor ?? form.valor) : form.valor;
@@ -158,14 +138,12 @@ export default function FormularioPromocion(props: Props) {
           delete nuevos.precioMinimo;
         }
       }
-
       if (campo === 'fechaFin') {
         const tiene = contexto?.tieneCaducidad ?? tieneCaducidad;
         const fFin = contexto?.fechaFin ?? fechaFin;
         if (tiene && !fFin) nuevos.fechaFin = 'Ingresá la fecha de finalización o desmarcá la opción.';
         else delete nuevos.fechaFin;
       }
-
       return nuevos;
     });
   }, [form, tieneCaducidad, fechaFin]);
@@ -187,7 +165,6 @@ export default function FormularioPromocion(props: Props) {
       setForm((prev) => ({ ...prev, valor: raw }));
       return;
     }
-
     if (name === 'precioMinimo') {
       const raw = desformatearMonto(value);
       setForm((prev) => ({ ...prev, precioMinimo: raw }));
@@ -202,16 +179,13 @@ export default function FormularioPromocion(props: Props) {
 
   const validarTodo = (): boolean => {
     const nuevos: Errores = {};
-
     if (!form.nombre.trim()) nuevos.nombre = 'El nombre es obligatorio.';
-
     const valorNum = parseFloat(form.valor);
     if (!form.valor || isNaN(valorNum)) {
       nuevos.valor = 'El valor es obligatorio.';
     } else if (form.tipoDescuento === '%' && (valorNum <= 1 || valorNum >= 100)) {
       nuevos.valor = 'El porcentaje debe ser mayor a 1 y menor a 100.';
     }
-
     if (form.tipoDescuento === '$') {
       const pmNum = parseFloat(form.precioMinimo);
       if (!form.precioMinimo || isNaN(pmNum)) {
@@ -220,11 +194,8 @@ export default function FormularioPromocion(props: Props) {
         nuevos.precioMinimo = `El precio mínimo debe ser al menos $${valorNum.toLocaleString('es-AR')}.`;
       }
     }
-
     if (tieneCaducidad && !fechaFin) nuevos.fechaFin = 'Ingresá la fecha de finalización o desmarcá la opción.';
-    //if (categorias.length === 0) nuevos.categorias = 'Seleccioná al menos un tipo de servicio.';
     if (filtroConError) nuevos.filtroUsuarios = 'El filtro de usuarios tiene errores. Revisalo antes de guardar.';
-
     setErrores(nuevos);
     return Object.keys(nuevos).length === 0;
   };
@@ -233,7 +204,6 @@ export default function FormularioPromocion(props: Props) {
     if (!validarTodo()) return;
     setLoading(true);
     setError('');
-
     const res = await fetch(
       esEdicion ? `/api/admin/promociones/${promocionId}` : '/api/admin/promociones',
       {
@@ -250,7 +220,6 @@ export default function FormularioPromocion(props: Props) {
         }),
       }
     );
-
     if (res.ok) {
       setHayCambios(false);
       if (esEdicion) {
