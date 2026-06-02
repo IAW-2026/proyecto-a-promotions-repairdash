@@ -9,7 +9,7 @@ import BuscarPromociones from '../componentes/BuscarPromociones';
 import { obtenerTiposServicio } from '@/lib/tiposServicio';
 import BotonVolver from '../componentes/BotonVolver';
 
-const POR_PAGINA = 9;
+const POR_PAGINA = 6;
 
 function obtenerParametro(valor: string | string[] | undefined) {
   return Array.isArray(valor) ? valor[0] ?? '' : valor ?? '';
