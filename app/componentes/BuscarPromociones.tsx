@@ -76,7 +76,6 @@ export default function BuscarPromociones({
     setExtrasPendientes(inicial);
   }, [queryNombre, stringServiciosUrl, stringExtrasUrl]);
 
-  // Cierra los filtros automáticamente al hacer click o tap fuera del panel abierto
   useEffect(() => {
     const escucharClickAfuera = (evento: MouseEvent) => {
       if (

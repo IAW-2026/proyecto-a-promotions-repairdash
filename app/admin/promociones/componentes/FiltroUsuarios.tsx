@@ -56,7 +56,6 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
       .then(setUsuarios);
   }, []);
 
-  // Validación de modo sin criterios
   useEffect(() => {
     if (modo === 'todos') {
       onError(false);
