@@ -55,7 +55,7 @@ export default function BuscarPromociones({
     setQuery(queryNombre);
     setServiciosPendientes(serviciosSeleccionados);
     setExtrasPendientes(extrasIniciales(filtrosExtra));
-  }, [queryNombre, stringServiciosUrl, stringExtrasUrl]);
+  }, [queryNombre, stringServiciosUrl, stringExtrasUrl, filtrosExtra, serviciosSeleccionados]);
 
   useEffect(() => {
     const escucharClickAfuera = (evento: MouseEvent) => {
