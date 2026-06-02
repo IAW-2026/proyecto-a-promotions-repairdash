@@ -12,6 +12,13 @@ export default function PaginaLogin() {
         fallbackRedirectUrl="/"
         transferable={false}
         withSignUp={false}
+        appearance={{
+          elements: {
+            footerAction: {
+              display: "none",
+            },
+          },
+        }}
       />
       </div>
     </main>
