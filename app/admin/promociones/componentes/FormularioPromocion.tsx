@@ -222,7 +222,6 @@ export default function FormularioPromocion(props: Props) {
     }
 
     if (tieneCaducidad && !fechaFin) nuevos.fechaFin = 'Ingresá la fecha de finalización o desmarcá la opción.';
-    //if (categorias.length === 0) nuevos.categorias = 'Seleccioná al menos un tipo de servicio.';
     if (filtroConError) nuevos.filtroUsuarios = 'El filtro de usuarios tiene errores. Revisalo antes de guardar.';
 
     setErrores(nuevos);

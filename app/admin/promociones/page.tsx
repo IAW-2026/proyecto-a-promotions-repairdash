@@ -134,7 +134,7 @@ export default async function AdminPromociones({
             queryNombre={queryNombre}
             serviciosSeleccionados={serviciosSeleccionados}
             tiposServicio={tiposServicio}
-            esAdmin={true} // <-- IMPORTANTE
+            esAdmin={true} 
             filtrosExtra={[
               {
                 nombre: 'estado',

@@ -32,7 +32,6 @@ export async function obtenerTiposServicio(): Promise<TipoServicio[]> {
     throw new Error('La API respondió pero el formato de datos es inválido.');
   }
 
-  // Mapeo limpio directo de la estructura que entrega su API
   return json.data.map((item: any) => ({
     id: item.id,
     nombre: item.nombre,
