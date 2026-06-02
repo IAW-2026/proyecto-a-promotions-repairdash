@@ -8,6 +8,7 @@ export default function Header() {
   const pathname = usePathname();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const { user } = useUser();
+
   const isAdmin = pathname.startsWith('/admin');
 
   const links = !user
@@ -33,6 +34,7 @@ export default function Header() {
           </h1>
         </Link>
 
+        {/* Desktop */}
         <nav className="hidden md:flex items-center gap-6">
           {links.map((link) => (
             <Link
@@ -63,6 +65,7 @@ export default function Header() {
           )}
         </nav>
 
+        {/* Mobile */}
         <div className="md:hidden flex items-center gap-3">
           {user ? (
             <>
@@ -89,6 +92,7 @@ export default function Header() {
         </div>
       </div>
 
+      {/* Mobile - menú desplegable */}
       {menuAbierto && user && (
         <nav className="md:hidden mt-4 flex flex-col gap-4 px-4">
           <span className="text-[#FBDAF9] text-sm border-b border-[#8D62A5] pb-3">

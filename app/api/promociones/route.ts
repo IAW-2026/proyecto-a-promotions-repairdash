@@ -7,8 +7,10 @@ export async function GET(req: Request) {
   if (apiKey !== process.env.RIDER_API_KEY) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
   }
+
   const { searchParams } = new URL(req.url);
   const usuarioId = searchParams.get('usuarioId');
+
   if (!usuarioId) {
     return NextResponse.json({ error: 'Falta usuarioId' }, { status: 400 });
   }
@@ -35,6 +37,7 @@ export async function GET(req: Request) {
         usoUnico: true,
       },
     });
+
     const promocionesFiltradas = await Promise.all(
       todasLasPromos.map(async (promo) => {
         const califica = await usuarioCalifica(usuarioId, promo.filtroUsuarios as any);

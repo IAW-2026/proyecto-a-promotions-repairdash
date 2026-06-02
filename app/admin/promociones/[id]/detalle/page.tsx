@@ -5,7 +5,14 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { obtenerTiposServicio } from '@/lib/tiposServicio';
 import BotonVolver from '@/app/componentes/BotonVolver';
-import { FiltroUsuarios } from '@/types/promociones';
+
+type FiltroUsuarios = {
+  idsEspecificos?: string[];
+  registradosDespuesDe?: string;
+  registradosAntesDe?: string;
+  minimoUsos?: number;
+  maximoUsos?: number;
+};
 
 function esFiltroUsuarios(value: unknown): value is FiltroUsuarios {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -13,6 +20,7 @@ function esFiltroUsuarios(value: unknown): value is FiltroUsuarios {
 
 function formatearFecha(fecha: Date | null) {
   if (!fecha) return 'No definida';
+
   return fecha.toLocaleDateString('es-AR', {
     day: '2-digit',
     month: '2-digit',
@@ -44,11 +52,13 @@ async function obtenerDetalleUsuarios(filtro: unknown) {
       titulo: 'Todos los usuarios', 
     };
   }
+
   if (filtro.idsEspecificos && filtro.idsEspecificos.length > 0) {
     return {
       titulo: 'Usuarios específicos',
     };
   }
+
   const criterios = [
     filtro.registradosDespuesDe
       ? `Registrados después de ${formatearFechaFiltro(filtro.registradosDespuesDe)}`
@@ -136,6 +146,7 @@ export default async function DetallePromocion({
                   {formatearDescuento(promo.tipoDescuento, promo.valor)}
                 </p>
               </div>
+
               <Link
                 href={`/admin/promociones/${promo.id}/edicion`}
                 className="px-3 py-1 bg-[#271033] text-[#C392DD] rounded-lg text-sm hover:bg-[#C392DD] hover:text-white transition-colors flex items-center font-normal"
@@ -143,6 +154,7 @@ export default async function DetallePromocion({
                 Editar
               </Link>
             </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-[#8D62A5]">
               <CampoDetalle label="ID">{promo.id}</CampoDetalle>
               <CampoDetalle label="Precio mínimo del servicio">{formatearMonto(promo.precioMinimo)}</CampoDetalle>

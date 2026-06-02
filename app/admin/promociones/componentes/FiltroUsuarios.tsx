@@ -1,13 +1,26 @@
 'use client';
 import { useEffect, useState } from 'react';
-import type { FiltroUsuarios } from '@/types/promociones';
-import type { Usuario } from '@/types/promociones';
+
+type FiltroUsuarios = {
+  idsEspecificos?: string[];
+  registradosDespuesDe?: string;
+  registradosAntesDe?: string;
+  minimoUsos?: number;
+  maximoUsos?: number;
+};
+
+type Usuario = {
+  id: string;
+  nombre: string;
+  fechaRegistro: string;
+};
 
 type Props = {
   value: FiltroUsuarios | null;
   onChange: (filtro: FiltroUsuarios | null) => void;
   onError: (hayError: boolean) => void;
 };
+
 type Modo = 'todos' | 'filtros' | 'especificos';
 
 function detectarModo(value: FiltroUsuarios | null): Modo {
@@ -15,12 +28,16 @@ function detectarModo(value: FiltroUsuarios | null): Modo {
   if (value.idsEspecificos && value.idsEspecificos.length > 0) return 'especificos';
   return 'filtros';
 }
+
 function tieneCriterios(filtro: FiltroUsuarios): boolean {
   return !!(
-    filtro.registradosDespuesDe || filtro.registradosAntesDe ||
-    filtro.minimoUsos !== undefined || filtro.maximoUsos !== undefined
+    filtro.registradosDespuesDe ||
+    filtro.registradosAntesDe ||
+    filtro.minimoUsos !== undefined ||
+    filtro.maximoUsos !== undefined
   );
 }
+
 function tieneEspecificos(filtro: FiltroUsuarios): boolean {
   return !!(filtro.idsEspecificos && filtro.idsEspecificos.length > 0);
 }
@@ -38,16 +55,21 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
       .then((res) => res.json())
       .then(setUsuarios);
   }, []);
+
+  // Validación de modo sin criterios
   useEffect(() => {
     if (modo === 'todos') {
       onError(false);
       return;
     }
+
     const hayErroresInternos = Object.values(errores).some((e) => e !== '');
+
     if (modo === 'filtros') {
       onError(hayErroresInternos || !tieneCriterios(filtro));
       return;
     }
+
     if (modo === 'especificos') {
       onError(hayErroresInternos || !tieneEspecificos(filtro));
       return;
@@ -58,16 +80,19 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
     const merged = { ...errores, ...nuevos };
     setErrores(merged);
   };
+
   const actualizar = (cambios: Partial<FiltroUsuarios>) => {
     const nuevo = { ...filtro, ...cambios };
     setFiltro(nuevo);
     onChange(nuevo);
   };
+
   const toggleUsuario = (id: string) => {
     const ids = filtro.idsEspecificos ?? [];
     const nuevo = ids.includes(id) ? ids.filter((i) => i !== id) : [...ids, id];
     actualizar({ idsEspecificos: nuevo.length > 0 ? nuevo : undefined });
   };
+
   const handleModo = (nuevoModo: Modo) => {
     if (nuevoModo === modo) return;
     const hayDatosEnModoActual =
@@ -79,6 +104,7 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
     }
     aplicarCambioModo(nuevoModo);
   };
+
   const aplicarCambioModo = (nuevoModo: Modo) => {
     setModo(nuevoModo);
     setFiltro({});
@@ -87,15 +113,18 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
     setErrores({ despues: '', antes: '', usos: '' });
     onChange(nuevoModo === 'todos' ? null : {});
   };
+
   const usuariosFiltrados = usuarios.filter((u) =>
     u.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
     u.id.toLowerCase().includes(busqueda.toLowerCase())
   );
+
   const modos: { key: Modo; label: string }[] = [
     { key: 'todos', label: 'Para todos' },
     { key: 'filtros', label: 'Por filtros' },
     { key: 'especificos', label: 'Usuarios específicos' },
   ];
+
   const mensajeConfirmacion = () => {
     if (modo === 'filtros') return 'Tenés filtros cargados. Si cambiás de opción se van a perder.';
     if (modo === 'especificos') {
