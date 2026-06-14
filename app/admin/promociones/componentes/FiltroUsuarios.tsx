@@ -51,9 +51,9 @@ export default function FiltroUsuariosSelector({ value, onChange, onError }: Pro
   const [errores, setErrores] = useState({ despues: '', antes: '', usos: '' });
 
   useEffect(() => {
-    fetch('/api/admin/usuarios')
-      .then((res) => res.json())
-      .then(setUsuarios);
+  fetch('/api/admin/usuarios')
+    .then((res) => res.json())
+    .then((json) => setUsuarios(json.data));
   }, []);
 
   useEffect(() => {

@@ -31,7 +31,8 @@ export default function TiposServicioSelector({ value, onChange, onAutoChange }:
         if (!res.ok) throw new Error(`Error ${res.status}`);
         return res.json();
       })
-      .then((data) => {
+      .then((json) => {
+        const data = json.data;
         setTipos(data);
         if (debeSeleccionarInicial.current) {
           const tiposIniciales = data.map((t: TipoServicio) => t.id);
