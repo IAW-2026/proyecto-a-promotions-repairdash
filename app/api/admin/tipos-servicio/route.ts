@@ -1,14 +1,11 @@
-
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { requireAdmin } from '@/lib/auth';
 import { obtenerTiposServicio } from '@/lib/tiposServicio';
 
 export async function GET() {
-  const user = await currentUser();
-  const role = (user?.publicMetadata as { role?: string })?.role;
-  if (role !== 'admin-promotions') {
-    return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-  }
+  const authError = await requireAdmin();
+  if (authError) return authError;
 
-  return NextResponse.json(await obtenerTiposServicio());
+  const tipos = await obtenerTiposServicio();
+  return NextResponse.json({ status: 'success', data: tipos });
 }
