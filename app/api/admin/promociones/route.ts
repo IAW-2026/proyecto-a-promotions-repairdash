@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { requireAdminOSuperAdmin, requireSuperAdmin } from '@/lib/auth';
 
-// POST — crear promoción (sin cambios, solo se agrega requireAdminOSuperAdmin)
+// POST — crear promoción
 export async function POST(req: Request) {
   const authError = await requireAdminOSuperAdmin(req);
   if (authError) return authError;
@@ -33,36 +33,62 @@ export async function POST(req: Request) {
   }
 }
 
-// GET — listar todas las promociones
-// INTERNAL_SERVICES_API_KEY
-// Query params opcionales:
-//   ?eliminada=true|false  →  por defecto devuelve solo las no eliminadas
-//   ?page=1&limit=20       →  paginación (default: page=1, limit=20, max limit=100)
+// GET — listar promociones
+//
+// Sin query params → devuelve todas las no eliminadas
+//
+// Query param opcional (no combinable con otros):
+//   ?estado=eliminadas   → promociones eliminadas
+//   ?estado=vigentes     → no eliminadas, fechaInicio <= ahora, (fechaFin null o >= ahora)
+//   ?estado=programadas  → no eliminadas, fechaInicio > ahora
+//   ?estado=vencidas     → no eliminadas, fechaFin < ahora
+//
+// Paginación:
+//   ?page=1&limit=20  (default: page=1, limit=20, max limit=100)
 export async function GET(req: Request) {
   const authError = await requireSuperAdmin(req);
   if (authError) return authError;
 
   try {
     const { searchParams } = new URL(req.url);
+    const ahora = new Date();
 
-    const eliminadaParam = searchParams.get('eliminada');
-    const eliminada =
-      eliminadaParam === 'true' ? true :
-      eliminadaParam === 'false' ? false :
-      false;
-
-    const page = Math.max(1, parseInt(searchParams.get('page') ?? '1'));
+    const page  = Math.max(1, parseInt(searchParams.get('page')  ?? '1'));
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') ?? '20')));
-    const skip = (page - 1) * limit;
+    const skip  = (page - 1) * limit;
+
+    const ESTADOS_VALIDOS = ['eliminadas', 'vigentes', 'programadas', 'vencidas'] as const;
+    type Estado = typeof ESTADOS_VALIDOS[number];
+
+    const estadoParam = searchParams.get('estado');
+
+    if (estadoParam !== null && !ESTADOS_VALIDOS.includes(estadoParam as Estado)) {
+      return NextResponse.json(
+        { error: 'Parámetro "estado" inválido. Use: eliminadas, vigentes, programadas o vencidas' },
+        { status: 400 }
+      );
+    }
+
+    const whereMap: Record<Estado, object> = {
+      eliminadas:  { eliminada: true },
+      vigentes:    { eliminada: false, fechaInicio: { lte: ahora }, OR: [{ fechaFin: null }, { fechaFin: { gte: ahora } }] },
+      programadas: { eliminada: false, fechaInicio: { gt: ahora } },
+      vencidas:    { eliminada: false, fechaFin: { lt: ahora } },
+    };
+
+    // Por defecto: todas las no eliminadas
+    const where = estadoParam
+      ? whereMap[estadoParam as Estado]
+      : { eliminada: false };
 
     const [promociones, total] = await Promise.all([
       prisma.promocion.findMany({
-        where: { eliminada },
+        where,
         orderBy: { fechaInicio: 'desc' },
         skip,
         take: limit,
       }),
-      prisma.promocion.count({ where: { eliminada } }),
+      prisma.promocion.count({ where }),
     ]);
 
     return NextResponse.json({

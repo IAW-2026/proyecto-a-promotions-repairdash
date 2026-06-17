@@ -44,28 +44,95 @@ export async function POST(req: Request) {
 }
 
 // GET — consultar historial de uso
-// Accesible por: INTERNAL_SERVICES_API_KEY (Control Plane, Analytics)
+// Accesible por: SuperAdmin
 //
-// Query params opcionales:
+// Query params opcionales (todos combinables entre sí):
 //   ?promocionId=5         → filtra por promoción
 //   ?usuarioId=abc123      → filtra por usuario
-//   ?page=1&limit=50       → paginación (default: page=1, limit=20)
+//   ?desde=2026-01-01      → filtra desde esa fecha (inclusive)
+//   ?hasta=2026-06-01      → filtra hasta esa fecha (inclusive)
+//   ?page=1&limit=20       → paginación (default: page=1, limit=20, max limit=100)
 export async function GET(req: Request) {
   const authError = await requireSuperAdmin(req);
-    if (authError) return authError;
+  if (authError) return authError;
 
   try {
     const { searchParams } = new URL(req.url);
 
-    const promocionId = searchParams.get('promocionId');
-    const usuarioId = searchParams.get('usuarioId');
-    const page = Math.max(1, parseInt(searchParams.get('page') ?? '1'));
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') ?? '20')));
-    const skip = (page - 1) * limit;
+    // — promocionId —
+    const promocionIdParam = searchParams.get('promocionId');
+    let promocionId: number | undefined;
+    if (promocionIdParam !== null) {
+      const parsed = parseInt(promocionIdParam);
+      if (isNaN(parsed) || parsed <= 0) {
+        return NextResponse.json({ error: 'Parámetro "promocionId" inválido. Debe ser un número entero positivo.' }, { status: 400 });
+      }
+      promocionId = parsed;
+    }
+
+    // — usuarioId —
+    const usuarioIdParam = searchParams.get('usuarioId');
+    let usuarioId: string | undefined;
+    if (usuarioIdParam !== null) {
+      if (usuarioIdParam.trim() === '') {
+        return NextResponse.json({ error: 'Parámetro "usuarioId" inválido. No puede estar vacío.' }, { status: 400 });
+      }
+      usuarioId = usuarioIdParam.trim();
+    }
+
+    // — desde / hasta —
+    const desdeParam = searchParams.get('desde');
+    const hastaParam = searchParams.get('hasta');
+    let fechaDesde: Date | undefined;
+    let fechaHasta: Date | undefined;
+
+    if (desdeParam !== null) {
+      fechaDesde = new Date(desdeParam);
+      if (isNaN(fechaDesde.getTime())) {
+        return NextResponse.json({ error: 'Parámetro "desde" inválido. Use formato YYYY-MM-DD o ISO 8601.' }, { status: 400 });
+      }
+    }
+
+    if (hastaParam !== null) {
+      fechaHasta = new Date(hastaParam);
+      if (isNaN(fechaHasta.getTime())) {
+        return NextResponse.json({ error: 'Parámetro "hasta" inválido. Use formato YYYY-MM-DD o ISO 8601.' }, { status: 400 });
+      }
+    }
+
+    if (fechaDesde && fechaHasta && fechaDesde > fechaHasta) {
+      return NextResponse.json({ error: 'El parámetro "desde" no puede ser posterior a "hasta".' }, { status: 400 });
+    }
+
+    // — page / limit —
+    const pageParam  = searchParams.get('page');
+    const limitParam = searchParams.get('limit');
+
+    const pageRaw  = pageParam  !== null ? parseInt(pageParam)  : 1;
+    const limitRaw = limitParam !== null ? parseInt(limitParam) : 20;
+
+    if (pageParam !== null && (isNaN(pageRaw) || pageRaw < 1)) {
+      return NextResponse.json({ error: 'Parámetro "page" inválido. Debe ser un número entero mayor a 0.' }, { status: 400 });
+    }
+    if (limitParam !== null && (isNaN(limitRaw) || limitRaw < 1)) {
+      return NextResponse.json({ error: 'Parámetro "limit" inválido. Debe ser un número entero mayor a 0.' }, { status: 400 });
+    }
+
+    const page  = pageRaw;
+    const limit = Math.min(100, limitRaw);
+    const skip  = (page - 1) * limit;
 
     const where = {
-      ...(promocionId ? { promocionId: parseInt(promocionId) } : {}),
-      ...(usuarioId ? { usuarioId } : {}),
+      ...(promocionId !== undefined ? { promocionId } : {}),
+      ...(usuarioId   !== undefined ? { usuarioId }   : {}),
+      ...((fechaDesde || fechaHasta)
+        ? {
+            fechaUso: {
+              ...(fechaDesde ? { gte: fechaDesde } : {}),
+              ...(fechaHasta ? { lte: fechaHasta } : {}),
+            },
+          }
+        : {}),
     };
 
     const [registros, total] = await Promise.all([
