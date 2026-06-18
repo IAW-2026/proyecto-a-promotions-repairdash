@@ -1,26 +1,14 @@
+// app/admin/promociones/[id]/detalle/page.tsx
 import Header from '../../../../componentes/Header';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
 import { obtenerTiposServicio } from '@/lib/tiposServicio';
 import BotonVolver from '@/app/componentes/BotonVolver';
-
-type FiltroUsuarios = {
-  idsEspecificos?: string[];
-  registradosDespuesDe?: string;
-  registradosAntesDe?: string;
-  minimoUsos?: number;
-  maximoUsos?: number;
-};
-
-function esFiltroUsuarios(value: unknown): value is FiltroUsuarios {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
+import { esFiltroUsuarios, formatearMonto, formatearDescuento, CampoDetalle, SeccionCategorias, type FiltroUsuarios } from '@/app/componentes/DetallePromocion';
 
 function formatearFecha(fecha: Date | null) {
   if (!fecha) return 'No definida';
-
   return fecha.toLocaleDateString('es-AR', {
     day: '2-digit',
     month: '2-digit',
@@ -30,33 +18,18 @@ function formatearFecha(fecha: Date | null) {
   });
 }
 
-function formatearMonto(valor: number | null) {
-  if (valor === null) return 'No definido';
-  return `$${valor.toLocaleString('es-AR')}`;
-}
-
-function formatearDescuento(tipo: string, valor: number) {
-  return tipo === '$'
-    ? `$${valor.toLocaleString('es-AR')} off`
-    : `${valor}% off`;
-}
-
 function formatearFechaFiltro(fecha?: string) {
   if (!fecha) return null;
   return new Date(`${fecha}T00:00:00`).toLocaleDateString('es-AR');
 }
 
-async function obtenerDetalleUsuarios(filtro: unknown) {
+function obtenerDetalleUsuarios(filtro: unknown): { titulo: string; detalle?: string[] } {
   if (!esFiltroUsuarios(filtro)) {
-    return {
-      titulo: 'Todos los usuarios', 
-    };
+    return { titulo: 'Todos los usuarios' };
   }
 
   if (filtro.idsEspecificos && filtro.idsEspecificos.length > 0) {
-    return {
-      titulo: 'Usuarios específicos',
-    };
+    return { titulo: 'Usuarios específicos' };
   }
 
   const criterios = [
@@ -72,27 +45,12 @@ async function obtenerDetalleUsuarios(filtro: unknown) {
     filtro.maximoUsos !== undefined
       ? `Máximo de promociones usadas: ${filtro.maximoUsos}`
       : null,
-  ].filter((criterio): criterio is string => Boolean(criterio));
+  ].filter((c): c is string => Boolean(c));
 
   return {
     titulo: 'Usuarios filtrados',
     detalle: criterios.length > 0 ? criterios : ['No hay criterios configurados.'],
   };
-}
-
-function CampoDetalle({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-1">
-      <p className="text-[#C392DD] text-sm font-semibold">{label}</p>
-      <div className="text-[#FBDAF9] text-sm leading-relaxed">{children}</div>
-    </div>
-  );
 }
 
 export default async function DetallePromocion({
@@ -107,14 +65,13 @@ export default async function DetallePromocion({
   if (!Number.isInteger(promocionId)) notFound();
 
   const promo = await prisma.promocion.findFirst({
-    where: { id: promocionId, eliminada: false }
+    where: { id: promocionId, eliminada: false },
   });
-
   if (!promo) notFound();
 
   const tiposServicio = await obtenerTiposServicio();
   const nombresPorCategoria = new Map(tiposServicio.map((tipo) => [tipo.id, tipo.nombre]));
-  const detalleUsuarios = await obtenerDetalleUsuarios(promo.filtroUsuarios);
+  const detalleUsuarios = obtenerDetalleUsuarios(promo.filtroUsuarios);
 
   const estaIniciada = promo.fechaInicio <= ahora;
   const noHaExpirado = promo.fechaFin === null || promo.fechaFin >= ahora;
@@ -173,27 +130,26 @@ export default async function DetallePromocion({
               <CampoDetalle label="Fecha de caducidad">{formatearFecha(promo.fechaFin)}</CampoDetalle>
             </div>
 
-            <div className="flex flex-col gap-2 pt-4 border-t border-[#8D62A5]">
-              <p className="text-[#C392DD] text-sm font-semibold">Tipos de servicio a los que aplica</p>
-              {promo.categorias.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {promo.categorias.map((categoriaId) => (
-                    <span
-                      key={categoriaId}
-                      className="px-3 py-1 bg-[#271033] text-[#C392DD] rounded-full text-xs border border-[#8D62A5]/40"
-                    >
-                      {nombresPorCategoria.get(categoriaId) ?? `ID: ${categoriaId} (no vigente)`}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-[#FBDAF9] text-sm">No definidos</p>
-              )}
-            </div>
+            <SeccionCategorias
+              categorias={promo.categorias}
+              nombresPorCategoria={nombresPorCategoria}
+              fallbackNombre={`ID desconocido`}
+            />
 
             <div className="flex flex-col gap-2 pt-4 border-t border-[#8D62A5]">
-              <p className="text-[#C392DD] text-sm font-semibold">Usuarios a los que aplica</p>
+              <p className="text-[#C392DD] text-xs font-bold uppercase tracking-wider">
+                Usuarios a los que aplica
+              </p>
               <p className="text-white text-sm font-semibold">{detalleUsuarios.titulo}</p>
+              {detalleUsuarios.detalle && (
+                <ul className="flex flex-col gap-1 mt-1">
+                  {detalleUsuarios.detalle.map((criterio) => (
+                    <li key={criterio} className="text-[#FBDAF9] text-sm">
+                      {criterio}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         </section>
