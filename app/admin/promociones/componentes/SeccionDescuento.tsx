@@ -1,5 +1,5 @@
 import { CampoFormulario } from './CampoFormulario';
-import { PromoForm, Errores } from './types';
+import { PromoForm, ErroresPromoForm } from './types';
 import { formatearMonto } from './useFormularioPromocion';
 
 const inputClase = (error?: string) =>
@@ -9,7 +9,7 @@ const inputClase = (error?: string) =>
 
 type Props = {
   form: Pick<PromoForm, 'tipoDescuento' | 'valor' | 'precioMinimo'>;
-  errores: Pick<Errores, 'valor' | 'precioMinimo'>;
+  errores: Pick<ErroresPromoForm, 'valor' | 'precioMinimo'>;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onBlurValor: () => void;
   onBlurPrecioMinimo: () => void;

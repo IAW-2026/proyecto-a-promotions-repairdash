@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { PromoForm, Errores, FiltroUsuarios, PropsFormulario } from './types';
+import { PromoForm, ErroresPromoForm, FiltroUsuarios, PropsFormulario } from './types';
 
 const formInicial: PromoForm = {
   nombre: '',
@@ -38,7 +38,7 @@ export function useFormularioPromocion(props: PropsFormulario) {
   const promocionId = props.modo === 'editar' ? props.promocionId : null;
 
   const [form, setForm] = useState<PromoForm>(formInicial);
-  const [errores, setErrores] = useState<Errores>({});
+  const [errores, setErrores] = useState<ErroresPromoForm>({});
   const [filtroUsuarios, setFiltroUsuarios] = useState<FiltroUsuarios | null>(null);
   const [filtroConError, setFiltroConError] = useState(false);
   const [categorias, setCategorias] = useState<string[]>([]);
@@ -57,7 +57,7 @@ export function useFormularioPromocion(props: PropsFormulario) {
     if (!cargandoInicial.current) setHayCambios(true);
   }, []);
 
-  const limpiarError = useCallback((campo: keyof Errores) => {
+  const limpiarError = useCallback((campo: keyof ErroresPromoForm) => {
     setErrores((prev) => {
       const nuevos = { ...prev };
       delete nuevos[campo];
@@ -156,7 +156,7 @@ export function useFormularioPromocion(props: PropsFormulario) {
   }, [form, tieneCaducidad, fechaFin]);
 
   const validarTodo = (): boolean => {
-    const nuevos: Errores = {};
+    const nuevos: ErroresPromoForm = {};
     if (!form.nombre.trim()) nuevos.nombre = 'El nombre es obligatorio.';
     const valorNum = parseFloat(form.valor);
     if (!form.valor || isNaN(valorNum)) {
