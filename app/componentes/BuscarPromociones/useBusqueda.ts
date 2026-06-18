@@ -83,17 +83,6 @@ export function useBusqueda({ basePath, queryNombre, serviciosSeleccionados, fil
     }
   };
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      const urlQuery = searchParamsRef.current.get('q') ?? '';
-      if (urlQuery !== query.trim()) {
-        ejecutarBusquedaTexto(query);
-      }
-    }, 400);
-
-    return () => clearTimeout(timeout);
-  }, [query, basePath]);
-
   const aplicarFiltrosManuales = (onAplicado?: () => void) => {
     const params = new URLSearchParams(searchParamsRef.current.toString());
     params.delete('page');
