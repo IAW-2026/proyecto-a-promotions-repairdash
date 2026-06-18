@@ -1,7 +1,7 @@
 'use client';
 
 import { FiltroUsuarios } from './types';
-import { useFiltroUsuarios } from './useFiltroUsuarios';
+import { useFiltroUsuarios } from '../hooks/useFiltroUsuarios';
 import { ModoSelector } from './ModoSelector';
 import { FiltrosPorCriterios } from './FiltrosPorCriterios';
 import { FiltroEspecificos } from './FiltroEspecificos';

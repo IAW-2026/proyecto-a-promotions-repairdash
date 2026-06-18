@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { PromoForm, ErroresPromoForm, FiltroUsuarios, PropsFormulario } from './types';
+import { PromoForm, ErroresPromoForm, FiltroUsuarios, PropsFormulario } from '../componentes/types';
 
 const formInicial: PromoForm = {
   nombre: '',
@@ -100,7 +100,7 @@ export function useFormularioPromocion(props: PropsFormulario) {
   const validarCampo = useCallback((
     campo: string,
     valor?: string,
-    contexto?: { tipoDescuento?: string; precioMinimo?: string; fechaFin?: string; tieneCaducidad?: boolean }
+    contexto?: { tipoDescuento?: string; precioMinimo?: string; fechaFin?: string; tieneCaducidad?: boolean; fechaInicio?: string }
   ) => {
     if (!form.nombre && !valor) return;
     const tipo = contexto?.tipoDescuento ?? form.tipoDescuento;
@@ -147,13 +147,19 @@ export function useFormularioPromocion(props: PropsFormulario) {
       if (campo === 'fechaFin') {
         const tiene = contexto?.tieneCaducidad ?? tieneCaducidad;
         const fFin = contexto?.fechaFin ?? fechaFin;
-        if (tiene && !fFin) nuevos.fechaFin = 'Ingresá la fecha de finalización o desmarcá la opción.';
-        else delete nuevos.fechaFin;
+        const fInicio = contexto?.fechaInicio ?? fechaInicio;
+        if (tiene && !fFin) {
+          nuevos.fechaFin = 'Ingresá la fecha de finalización o desmarcá la opción.';
+        } else if (tiene && fFin && fInicio >= fFin) {
+          nuevos.fechaFin = 'La fecha de caducidad debe ser posterior a la de inicio.';
+        } else {
+          delete nuevos.fechaFin;
+        }
       }
 
       return nuevos;
     });
-  }, [form, tieneCaducidad, fechaFin]);
+  }, [form, tieneCaducidad, fechaFin, fechaInicio]);
 
   const validarTodo = (): boolean => {
     const nuevos: ErroresPromoForm = {};
@@ -172,7 +178,11 @@ export function useFormularioPromocion(props: PropsFormulario) {
         nuevos.precioMinimo = `El precio mínimo debe ser al menos $${valorNum.toLocaleString('es-AR')}.`;
       }
     }
-    if (tieneCaducidad && !fechaFin) nuevos.fechaFin = 'Ingresá la fecha de finalización o desmarcá la opción.';
+    if (tieneCaducidad && !fechaFin) {
+      nuevos.fechaFin = 'Ingresá la fecha de finalización o desmarcá la opción.';
+    } else if (tieneCaducidad && fechaFin && fechaInicio >= fechaFin) {
+      nuevos.fechaFin = 'La fecha de caducidad debe ser posterior a la de inicio.';
+    }
     if (filtroConError) nuevos.filtroUsuarios = 'El filtro de usuarios tiene errores. Revisalo antes de guardar.';
     setErrores(nuevos);
     return Object.keys(nuevos).length === 0;
@@ -239,7 +249,6 @@ export function useFormularioPromocion(props: PropsFormulario) {
   };
 
   return {
-    // Estado del form
     form,
     errores,
     filtroUsuarios,
@@ -247,21 +256,17 @@ export function useFormularioPromocion(props: PropsFormulario) {
     fechaInicio,
     tieneCaducidad,
     fechaFin,
-    // Estado UI
     loading,
     loadingData,
     error,
     guardado,
     esEdicion,
-    // Setters que el formulario necesita directamente
     setFiltroUsuarios,
     setCategorias,
     setFechaInicio,
     setTieneCaducidad,
     setFechaFin,
-    setErrores,
     setFiltroConError,
-    // Handlers
     handleChange,
     handleVolver,
     handleSubmit,

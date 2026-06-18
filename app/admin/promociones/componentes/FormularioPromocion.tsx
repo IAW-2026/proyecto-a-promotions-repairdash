@@ -6,7 +6,7 @@ import TiposServicioSelector from './TipoServicioSelector';
 import { CampoFormulario } from './CampoFormulario';
 import { SeccionVigencia } from './SeccionVigencia';
 import { SeccionDescuento } from './SeccionDescuento';
-import { useFormularioPromocion } from './useFormularioPromocion';
+import { useFormularioPromocion } from '../hooks/useFormularioPromocion';
 import { PropsFormulario } from './types';
 
 const inputClase = (error?: string) =>
@@ -20,7 +20,7 @@ export default function FormularioPromocion(props: PropsFormulario) {
     fechaInicio, tieneCaducidad, fechaFin,
     loading, loadingData, error, guardado, esEdicion,
     setFiltroUsuarios, setCategorias, setFechaInicio,
-    setTieneCaducidad, setFechaFin, setErrores, setFiltroConError,
+    setTieneCaducidad, setFechaFin, setFiltroConError,
     handleChange, handleVolver, handleSubmit, validarCampo, marcarCambios, limpiarError,
   } = useFormularioPromocion(props);
 
@@ -85,14 +85,21 @@ export default function FormularioPromocion(props: PropsFormulario) {
               fechaFin={fechaFin}
               tieneCaducidad={tieneCaducidad}
               errorFechaFin={errores.fechaFin}
-              onChangeFechaInicio={(v) => { marcarCambios(); setFechaInicio(v); }}
-              onChangeFechaFin={(v) => { marcarCambios(); setFechaFin(v); }}
+              onChangeFechaInicio={(v) => {
+                marcarCambios();
+                setFechaInicio(v);
+                if (tieneCaducidad) validarCampo('fechaFin', undefined, { fechaInicio: v });
+              }}
+              onChangeFechaFin={(v) => {
+                marcarCambios();
+                setFechaFin(v);
+              }}
               onChangeTieneCaducidad={(v) => {
                 marcarCambios();
                 setTieneCaducidad(v);
                 if (!v) {
                   setFechaFin('');
-                  setErrores((prev) => { const n = { ...prev }; delete n.fechaFin; return n; });
+                  limpiarError('fechaFin');
                 }
               }}
               onBlurFechaFin={() => validarCampo('fechaFin')}

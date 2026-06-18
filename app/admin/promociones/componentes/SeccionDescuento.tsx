@@ -1,6 +1,6 @@
 import { CampoFormulario } from './CampoFormulario';
 import { PromoForm, ErroresPromoForm } from './types';
-import { formatearMonto } from './useFormularioPromocion';
+import { formatearMonto } from '../hooks/useFormularioPromocion';
 
 const inputClase = (error?: string) =>
   `bg-[#271033] border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F500F1] ${

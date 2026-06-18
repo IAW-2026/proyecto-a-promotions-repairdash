@@ -1,5 +1,5 @@
 import { FiltroUsuarios, Usuario } from './types';
-import { tieneEspecificos } from './useFiltroUsuarios';
+import { tieneEspecificos } from '../hooks/useFiltroUsuarios';
 
 type Props = {
   filtro: FiltroUsuarios;

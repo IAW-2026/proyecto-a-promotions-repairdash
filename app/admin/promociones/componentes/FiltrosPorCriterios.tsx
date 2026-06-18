@@ -1,5 +1,5 @@
 import { FiltroUsuarios, ErroresFiltro } from './types';
-import { tieneCriterios } from './useFiltroUsuarios';
+import { tieneCriterios } from '../hooks/useFiltroUsuarios';
 
 type Props = {
   filtro: FiltroUsuarios;
