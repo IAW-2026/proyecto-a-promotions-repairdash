@@ -5,17 +5,9 @@ import { currentUser } from '@clerk/nextjs/server';
 import Paginacion from '../componentes/Paginacion';
 import RiderAppLink from '../componentes/RiderAppLink';
 import BotonVolver from '../componentes/BotonVolver';
+import HistorialTabla from '../componentes/HistorialTabla';
 
 const POR_PAGINA = 6;
-
-type ItemHistorial = {
-  id: number;
-  nombre: string;
-  fechaUso: Date;
-  valorPagado: number;
-  valorOriginal: number;
-  trabajoId: number;
-};
 
 export default async function PaginaHistorial({
   searchParams,
@@ -30,7 +22,7 @@ export default async function PaginaHistorial({
     where: { usuarioId: user?.id ?? '' },
   });
 
-  const historial: ItemHistorial[] = await prisma.historialDeUso.findMany({
+  const historial = await prisma.historialDeUso.findMany({
     where: { usuarioId: user?.id ?? '' },
     orderBy: { fechaUso: 'desc' },
     skip: (paginaActual - 1) * POR_PAGINA,
@@ -86,55 +78,16 @@ export default async function PaginaHistorial({
               </Link>
             </div>
           ) : (
-            <>
-              <div className="hidden md:flex flex-col gap-3">
-                <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] px-6 py-3">
-                  {["Promoción", "Trabajo", "Fecha", "Precio original", "Pagaste", "Ahorraste"].map((col) => (
-                    <span key={col} className="text-[#C392DD] text-sm font-semibold">{col}</span>
-                  ))}
-                </div>
-                {historialFormateado.map((item) => (
-                  <div key={item.id} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] px-6 py-4 items-center bg-[#8D62A5] rounded-2xl border border-[#C392DD] hover:border-[#F500F1] transition-colors">
-                    <span className="text-white font-extrabold">{item.nombre}</span>
-                    <span className="text-[#C392DD] font-semibold">#{item.trabajoId}</span>
-                    <span className="text-[#FBDAF9] text-sm">{item.fechaUso}</span>
-                    <span className="text-[#FBDAF9] line-through">${item.valorOriginal.toLocaleString('es-AR')}</span>
-                    <span className="text-white font-bold">${item.valorPagado.toLocaleString('es-AR')}</span>
-                    <span className="text-white font-bold">${(item.valorOriginal - item.valorPagado).toLocaleString('es-AR')}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex flex-col gap-4 md:hidden">
-                {historialFormateado.map((item) => (
-                  <div key={item.id} className="p-5 bg-[#8D62A5] rounded-2xl border border-[#C392DD] flex flex-col gap-3">
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-white font-extrabold text-xl">{item.nombre}</h3>
-                      <span className="text-xs text-[#FBDAF9] ml-2">{item.fechaUso}</span>
-                    </div>
-                    <span className="text-[#FBDAF9] text-xs">
-                      Trabajo <span className="font-semibold text-[#C392DD]">#{item.trabajoId}</span>
-                    </span>
-                    <div className="flex justify-between pt-3 border-t border-[#C392DD]">
-                      <div>
-                        <p className="text-[#FBDAF9] text-xs mb-1">Precio original</p>
-                        <p className="text-[#FBDAF9] line-through">${item.valorOriginal.toLocaleString('es-AR')}</p>
-                      </div>
-                      <div>
-                        <p className="text-[#FBDAF9] text-xs mb-1">Pagaste</p>
-                        <p className="text-white font-bold text-lg">${item.valorPagado.toLocaleString('es-AR')}</p>
-                      </div>
-                      <div>
-                        <p className="text-[#FBDAF9] text-xs mb-1">Ahorraste</p>
-                        <p className="text-white font-bold text-lg">${(item.valorOriginal - item.valorPagado).toLocaleString('es-AR')}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <Paginacion paginaActual={paginaActual} totalPaginas={totalPaginas} basePath="/historial" />
-            </>
+            <HistorialTabla
+              historial={historialFormateado}
+              paginacion={
+                <Paginacion
+                  paginaActual={paginaActual}
+                  totalPaginas={totalPaginas}
+                  basePath="/historial"
+                />
+              }
+            />
           )}
         </section>
         <footer className="mt-12 text-center text-[#FBDAF9] text-sm">

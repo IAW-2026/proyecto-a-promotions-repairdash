@@ -2,20 +2,7 @@ import Header from '../../componentes/Header';
 import { prisma } from '@/lib/prisma';
 import Paginacion from '../../componentes/Paginacion';
 import BotonVolver from '@/app/componentes/BotonVolver';
-
-type ItemHistorial = {
-  id: number;
-  nombre: string;
-  fechaUso: Date;
-  valorPagado: number;
-  valorOriginal: number;
-  trabajoId: number;
-  usuarioId: string;
-};
-
-function abreviarId(id: string) {
-  return `...${id.slice(-6)}`;
-}
+import HistorialTabla from '@/app/componentes/HistorialTabla';
 
 const POR_PAGINA = 6;
 
@@ -39,7 +26,7 @@ export default async function HistorialAdmin({
   const total = todoElHistorial.length;
   const totalPaginas = Math.ceil(total / POR_PAGINA);
 
-  const historialPaginado: ItemHistorial[] = await prisma.historialDeUso.findMany({
+  const historialPaginado = await prisma.historialDeUso.findMany({
     orderBy: { fechaUso: 'desc' },
     skip: (paginaActual - 1) * POR_PAGINA,
     take: POR_PAGINA,
@@ -50,16 +37,16 @@ export default async function HistorialAdmin({
     fechaUso: item.fechaUso.toLocaleDateString('es-AR'),
   }));
 
-  const usuariosUnicos = new Set(todoElHistorial.map(item => item.usuarioId)).size;
+  const usuariosUnicos = new Set(todoElHistorial.map((item) => item.usuarioId)).size;
 
   const conteoPromos: Record<string, number> = {};
-  todoElHistorial.forEach(item => {
+  todoElHistorial.forEach((item) => {
     conteoPromos[item.nombre] = (conteoPromos[item.nombre] || 0) + 1;
   });
 
-  const promoMasUsada = Object.entries(conteoPromos).reduce((a, b) =>
-    (a[1] > b[1] ? a : b),
-    ["Ninguna", 0]
+  const promoMasUsada = Object.entries(conteoPromos).reduce(
+    (a, b) => (a[1] > b[1] ? a : b),
+    ['Ninguna', 0]
   );
 
   const totalAhorro = todoElHistorial.reduce(
@@ -105,65 +92,17 @@ export default async function HistorialAdmin({
               <p className="text-[#FBDAF9]">Sin datos disponibles.</p>
             </div>
           ) : (
-            <>
-              {/* Tabla Desktop */}
-              <div className="hidden md:flex flex-col gap-3 overflow-x-auto">
-                <div className="grid grid-cols-[1.2fr_2.1fr_1fr_1fr_1fr_1fr_1fr] px-6 py-3 min-w-[900px]">
-                  {["Usuario", "Promoción", "Trabajo", "Fecha", "Original", "Pagó", "Ahorró"].map((col) => (
-                    <span key={col} className="text-[#C392DD] text-sm font-semibold">{col}</span>
-                  ))}
-                </div>
-                {historialFormateado.map((item) => (
-                  <div key={item.id} className="grid grid-cols-[1.0fr_2.4fr_0.8fr_1fr_1fr_1fr_1fr] px-6 py-4 items-center bg-[#8D62A5] rounded-2xl border border-[#C392DD] min-w-[900px]">
-                    <span className="text-[#FBDAF9] text-xs font-mono" title={item.usuarioId}>
-                      {abreviarId(item.usuarioId)}
-                    </span>
-                    <span className="text-white font-extrabold">{item.nombre}</span>
-                    <span className="text-[#C392DD] font-semibold">#{item.trabajoId}</span>
-                    <span className="text-[#FBDAF9] text-sm">{item.fechaUso}</span>
-                    <span className="text-[#FBDAF9] line-through">${item.valorOriginal.toLocaleString('es-AR')}</span>
-                    <span className="text-white font-bold">${item.valorPagado.toLocaleString('es-AR')}</span>
-                    <span className="text-white font-extrabold">${(item.valorOriginal - item.valorPagado).toLocaleString('es-AR')}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Cards Mobile */}
-              <div className="flex flex-col gap-4 md:hidden">
-                {historialFormateado.map((item) => (
-                  <div key={item.id} className="p-5 bg-[#8D62A5] rounded-2xl border border-[#C392DD] flex flex-col gap-3">
-                    <div className="flex flex-col gap-1">
-                      <div className="flex justify-between items-center">
-                        <h3 className="text-white font-extrabold text-xl">{item.nombre}</h3>
-                        <span className="text-s text-[#FBDAF9]">{item.fechaUso}</span>
-                      </div>
-                      <span className="text-xs text-[#C392DD] font-mono">
-                        ID:{item.usuarioId}
-                      </span>
-                    </div>
-                    <div className="flex justify-between pt-3 border-t border-[#C392DD]">
-                      <div>
-                        <p className="text-[#FBDAF9] text-[10px]">Original</p>
-                        <p className="text-[#FBDAF9] line-through text-xs">${item.valorOriginal.toLocaleString('es-AR')}</p>
-                      </div>
-                      <div>
-                        <p className="text-[#FBDAF9] text-[10px]">Pagó</p>
-                        <p className="text-white font-bold">${item.valorPagado.toLocaleString('es-AR')}</p>
-                      </div>
-                      <div>
-                        <p className="text-[#FBDAF9] text-[10px]">Ahorró</p>
-                        <p className="text-white font-extrabold">${(item.valorOriginal - item.valorPagado).toLocaleString('es-AR')}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Paginacion 
-                paginaActual={paginaActual} 
-                totalPaginas={totalPaginas} 
-                basePath="/admin/historial" 
-              />
-            </>
+            <HistorialTabla
+              historial={historialFormateado}
+              mostrarUsuario
+              paginacion={
+                <Paginacion
+                  paginaActual={paginaActual}
+                  totalPaginas={totalPaginas}
+                  basePath="/admin/historial"
+                />
+              }
+            />
           )}
         </section>
         <footer className="mt-12 text-center text-[#FBDAF9] text-sm">
