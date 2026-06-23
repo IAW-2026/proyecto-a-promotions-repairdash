@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FiltroUsuarios, Usuario, Modo, ErroresFiltro } from './types';
+import { FiltroUsuarios, Usuario, Modo, ErroresFiltro } from '../componentes/types';
 
 export function tieneCriterios(filtro: FiltroUsuarios): boolean {
   return !!(
